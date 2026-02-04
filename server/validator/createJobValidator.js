@@ -38,21 +38,32 @@ exports.createJobValidator = [
     .isArray({ min: 1 })
     .withMessage("skills must be an array with at least one item"),
 
-  body("skills.*")
-    .isString()
+  body("skills.*").isString().trim().withMessage("each skill must be a string"),
+
+  body("description")
     .trim()
-    .withMessage("each skill must be a string"),
+    .notEmpty()
+    .withMessage("job description cannot be empty"),
 
-  body("description").trim().notEmpty().withMessage("job description cannot be empty"),
-
-  body("isActive").optional().isBoolean().withMessage("this accepts only boolean true or false").toBoolean(),
+  body("isActive")
+    .optional()
+    .isBoolean()
+    .withMessage("this accepts only boolean true or false")
+    .toBoolean(),
 
   (req, res, next) => {
-    const errors=validationResult(req);
-    if(errors.length>0){
-        console.log(errors)
-        res.send("erros")
+    const errors = validationResult(req);
+    //error returns an object if error is there 
+    //.isempty is false we need true to enter 
+    if(!errors.isEmpty()){
+      return res.status(400).json({
+        success:false,
+        errors:errors.array()
+      });
+
     }
-    next();
+    next()
+
+ 
   },
 ];

@@ -1,18 +1,21 @@
 require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
-const UserRouter = require("./routers/userRouter");
-const { connectDB } = require("./DB/configDB");
-const recruiterRoutes = require("./routers/recruiterRouter");
+const {connectDB}=require('./DB/configDB')
+const Routes = require("./routers/routes");
 const app = express();
 app.use(cors());
 app.use(express.json())
 app.use(express.urlencoded({extended:true}))
 
-app.use("/user/", UserRouter);
-app.use("/", recruiterRoutes);
+app.use("/", Routes);
 
 app.listen(process.env.PORT, () => {
-  connectDB();
-  console.log("server is listening in port no 5000");
+  try{
+    connectDB();
+    console.log(`server is listening in port no ${process.env.PORT}`);
+  }
+  catch(err){
+    console.log(err);
+  }
 });

@@ -40,14 +40,15 @@ const jobSchema = new mongoose.Schema(
       type: Boolean,
       required: true,
     },
-    createdBy: {
+      createdBy: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "users",
       required: true,
     },
+  
   },
   {
     timestamps: true,
   },
 );
-export default mongoose.model("Jobs", jobSchema);
+module.exports = mongoose.model("Jobs", jobSchema);
