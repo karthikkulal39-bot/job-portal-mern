@@ -1,0 +1,62 @@
+const { validationResult, body } = require("express-validator");
+exports.autLoginValidator = [
+  body("email")
+    .trim()
+    .notEmpty()
+    .withMessage("email cannot be empty or invalid email"),
+  body("password")
+    .notEmpty()
+    .withMessage("password cannot be empty or invalid password"),
+  (req, res, next) => {
+    const err = validationResult(req);
+
+    if (!err.isEmpty()) {
+      return res.status(501).json({
+        success: false,
+        error: err.array(),
+      });
+    }
+    next();
+  },
+];
+exports.authSignupValidator = [
+  body("firstname").trim().notEmpty().withMessage("first cannot empty"),
+  body("lastname").trim(),
+  body("email")
+    .isEmail()
+    .notEmpty()
+    .withMessage("email cannot be empty or invalid email")
+    .normalizeEmail(),
+  body("password")
+    .isLength({ min: 8 })
+    .withMessage("Password must be at least 8 characters long")
+    .matches(/[A-Z]/)
+    .withMessage("Password must contain at least one uppercase letter")
+    .matches(/[0-9]/)
+    .withMessage("Password must contain at least one number")
+    .matches(/[@$!%*?&]/)
+    .withMessage("Password must contain at least one special character")
+    .trim(),
+  body("confirmPassword")
+    .trim()
+    .custom((value, { req }) => {
+      if (value !== req.body.password) {
+        throw new Error("password did not macthed");
+      }
+      return true;
+    }),
+    body("role").optional().isIn(["user","recruiter"]).withMessage("invalid role selected "),
+    (req,res,next)=>{
+        const err=validationResult(req);
+        if(!err.isEmpty()){
+            return res.status(400).json({
+                success:false,
+                errors:err.array()
+            })
+        }
+        next();
+
+    }
+
+
+]
