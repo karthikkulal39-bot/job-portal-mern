@@ -1,43 +1,42 @@
-const mongoose=require('mongoose')
-const bcrypt=require('bcryptjs')
-const userschema=new mongoose.Schema({
-    firstname:{
-        type:String,
-        required:true,
-        
+const mongoose = require("mongoose");
+const bcrypt = require("bcryptjs");
+const userschema = new mongoose.Schema(
+  {
+    firstname: {
+      type: String,
+      required: true,
     },
-    lastname:{
-        type:String,
+    lastname: {
+      type: String,
     },
-    email:{
-        type:String,
-        required:[true, "email is mandatory"],
-        unique:[true, "this email already registered"],
-        trim:true
+    email: {
+      type: String,
+      required: [true, "email is mandatory"],
+      unique: [true, "this email already registered"],
+      trim: true,
     },
-    password:{
-        type:String,
-        required:[true, 'password is mandatory'],
-        trim:true,
+    password: {
+      type: String,
+      required: [true, "password is mandatory"],
+      trim: true,
     },
-    usertype:{
-        type:String,
-        enum:["user","recruiter"],  
-        required:true,
-        default:"user"
-
-    }
-
-},{timestamps:true})
-userschema.pre('save', async function(next){
-    if(!this.isModified("password")){
-        return ;
-    }
-    try{
-        this.password= bcrypt.hash(this.password,12)
-    }catch(err){ 
-        throw new Error(err)
-    }
-  
-})
-module.exports=mongoose.model("Users",userschema)
+    usertype: {
+      type: String,
+      enum: ["user", "recruiter"],
+      required: true,
+      default: "user",
+    },
+  },
+  { timestamps: true },
+);
+userschema.pre("save", async function () {
+  if (!this.isModified("password")) {
+    return;
+  }
+  try {
+    this.password = await bcrypt.hash(this.password, 12);
+  } catch (err) {
+    throw new Error(err);
+  }
+});
+module.exports = mongoose.model("Users", userschema);

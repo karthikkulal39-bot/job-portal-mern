@@ -1,9 +1,11 @@
 const { validationResult, body } = require("express-validator");
-exports.autLoginValidator = [
+exports.authLoginValidator = [
   body("email")
     .trim()
     .notEmpty()
-    .withMessage("email cannot be empty or invalid email"),
+    .withMessage("email cannot be empty or invalid email")
+    .normalizeEmail(),
+
   body("password")
     .notEmpty()
     .withMessage("password cannot be empty or invalid password"),
@@ -19,6 +21,7 @@ exports.autLoginValidator = [
     next();
   },
 ];
+
 exports.authSignupValidator = [
   body("firstname").trim().notEmpty().withMessage("first cannot empty"),
   body("lastname").trim(),
@@ -28,7 +31,7 @@ exports.authSignupValidator = [
     .withMessage("email cannot be empty or invalid email")
     .normalizeEmail(),
   body("password")
-    .isLength({ min: 8 })
+    .isLength({ min: 4 })
     .withMessage("Password must be at least 8 characters long")
     .matches(/[A-Z]/)
     .withMessage("Password must contain at least one uppercase letter")
