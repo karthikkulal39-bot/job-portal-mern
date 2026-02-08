@@ -2,11 +2,14 @@ const Jobs = require("../models/jobs");
 
 exports.createJob = async (req, res) => {
   try {
-    const job = await Jobs.create(req.body);
-    return res.status(201).json({
-      success: true,
-      data: job,
-    });
+   
+      const job = await Jobs.create({...req.body,
+        createdBy:req.user.id
+      });
+      return res.status(201).json({
+        success: true,
+        data: job,
+      });
   } catch (err) {
     return res.status(500).json({
       success: false,
@@ -58,7 +61,7 @@ exports.updateJobs = async (req, res) => {
       { _id: id },
       { $set: allowedResult },
       { runValidators: true },
-      {new:true}, //this line return updated value
+      { new: true }, //this line return updated value
     );
     return res.status(200).json({
       success: true,
@@ -96,21 +99,19 @@ exports.deleteJob = async (req, res) => {
   }
 };
 
-exports.getOneJob=async(req,res)=>{
-  const jobId=req.params.id;
-  try{
-    const job= await Jobs.findOne({_id:jobId})
-    console.log(job)
+exports.getOneJob = async (req, res) => {
+  const jobId = req.params.id;
+  try {
+    const job = await Jobs.findOne({ _id: jobId });
+    console.log(job);
     res.status(200).json({
-      success:true,
-      data:job
-    })
-  }
-  catch(error){
+      success: true,
+      data: job,
+    });
+  } catch (error) {
     res.status(500).json({
-      success:false,
-      message:error.message
-    })
-
+      success: false,
+      message: error.message,
+    });
   }
-}
+};

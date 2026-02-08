@@ -20,7 +20,7 @@ const userschema = new mongoose.Schema(
       required: [true, "password is mandatory"],
       trim: true,
     },
-    usertype: {
+    role: {
       type: String,
       enum: ["user", "recruiter"],
       required: true,
