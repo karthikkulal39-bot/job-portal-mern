@@ -1,4 +1,5 @@
 const jwt=require('jsonwebtoken');
+const decodeToken = require('../utils/decodeJWT');
 
 exports.isAuthenticated=(req,res,next)=>{
     try {
@@ -9,9 +10,8 @@ exports.isAuthenticated=(req,res,next)=>{
                 message:"not authenticated"
             })
         }
-        const decoded=jwt.verify(token,process.env.JWT_SECRET);
+        const decoded=decodeToken(token);
         req.user=decoded;
-
         next();
         
     } catch (error) {

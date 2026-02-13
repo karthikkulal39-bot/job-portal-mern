@@ -1,3 +1,4 @@
+
 const Jobs = require("../models/jobs");
 
 exports.createJob = async (req, res) => {
@@ -36,6 +37,14 @@ exports.getAllJobs = async (req, res) => {
 exports.updateJobs = async (req, res) => {
   const updateData = req.body;
   const id = req.params.id;
+  const jobs=await Jobs.findById(id);
+  if(jobs.createdBy.toString()!==req.user.id){
+    return res.status(400).json({
+      sucecss:false,
+      message:"cannnot update other's "
+    })
+
+  }
   const allowedUpdates = [
     "title",
     "company",
@@ -76,7 +85,13 @@ exports.updateJobs = async (req, res) => {
 };
 exports.deleteJob = async (req, res) => {
   const id = req.params.id;
-  console.log(id);
+  const jobs=await Jobs.findById(id);
+  if(jobs.createdBy!==req.user.id){
+    return res.status(400).json({
+      success : false,
+      message:"cannot delete someones jobs post"
+    })
+  }
   try {
     const deleteData = await Jobs.findByIdAndDelete({ _id: id });
 

@@ -1,6 +1,8 @@
 const users = require("../models/users");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
+const { comparePass } = require("../utils/comparedHashPAss");
+const sendToken = require("../utils/sendToken");
 exports.userSignUp = async (req, res) => {
   const userdata = req.body;
   const allowedFeilds = ["firstname", "lastname", "email", "password", "role"];
@@ -35,36 +37,14 @@ exports.userLogin = async (req, res) => {
         message: "Invalid credentials",
       });
     }
-    const isMatch = await bcrypt.compare(password, foundUser.password);
+    const isMatch = comparePass(password, foundUser.password);
     if (isMatch) {
-      const token = jwt.sign(
-        {
-          id: foundUser._id,
-          role: foundUser.role,
-        },
-        process.env.JWT_SECRET,
-        { expiresIn: process.env.TOKEN_EXPIRE },
-      );
-      res.cookie("token",token,{
-        httpOnly:true,
-        secure:true,
-        sameSite:"Strict",
-      })
-      res.status(200).json({
-        success: true,
-        token,
-        user:{
-            id:foundUser._id,
-            email:foundUser.email,
-            role:foundUser.usertype,
-        }
+      sendToken(foundUser, res);
+    } else {
+      return res.status(401).json({
+        success: false,
+        message: "Invalid credentials",
       });
-    }
-    else{
-        return res.status(401).json({
-            success:false,
-            message:"Invalid credentials"
-        })
     }
   } catch (error) {
     return res.status(500).json({
