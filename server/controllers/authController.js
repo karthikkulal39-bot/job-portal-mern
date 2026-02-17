@@ -3,6 +3,7 @@ const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 const { comparePass } = require("../utils/comparedHashPAss");
 const sendToken = require("../utils/sendToken");
+
 exports.userSignUp = async (req, res) => {
   const userdata = req.body;
   const allowedFeilds = ["firstname", "lastname", "email", "password", "role"];

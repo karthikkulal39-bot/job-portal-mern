@@ -6,6 +6,7 @@ const {
   updateJobs,
   deleteJob,
   getOneJob,
+  jobsPostedByMe,
 } = require("../controllers/jobsController");
 const { createJobValidator } = require("../validator/createJobValidator");
 const { userSignUp, userLogin } = require("../controllers/authController");
@@ -18,6 +19,9 @@ const { authorizeRole } = require("../middlewares/roleMiddleware");
 
 const applyJobs=require('../controllers/applyJobs');
 const uploadResume = require("../middlewares/uploadHandler");
+const applicationValidation = require("../validator/applicationValidator");
+
+
 Routes.post(
   "/jobs/",
   isAuthenticated,
@@ -33,6 +37,7 @@ Routes.get("/jobs/:id", isAuthenticated,authorizeRole("recruiter","user"), getOn
 Routes.post("/usersignup", authSignupValidator, userSignUp);
 Routes.post("/userslogin", authLoginValidator, userLogin);
 
-Routes.post('/application',uploadResume,applyJobs);
+Routes.post('/application',isAuthenticated,authorizeRole("user"),uploadResume,applicationValidation,applyJobs);
 
+Routes.get('/recruiter/jobspostedbyme',isAuthenticated,jobsPostedByMe);
 module.exports = Routes;

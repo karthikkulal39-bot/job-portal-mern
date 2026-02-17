@@ -83,6 +83,7 @@ exports.updateJobs = async (req, res) => {
     });
   }
 };
+
 exports.deleteJob = async (req, res) => {
   const id = req.params.id;
   const jobs=await Jobs.findById(id);
@@ -118,7 +119,6 @@ exports.getOneJob = async (req, res) => {
   const jobId = req.params.id;
   try {
     const job = await Jobs.findOne({ _id: jobId });
-    console.log(job);
     res.status(200).json({
       success: true,
       data: job,
@@ -130,3 +130,23 @@ exports.getOneJob = async (req, res) => {
     });
   }
 };
+
+exports.jobsPostedByMe = async(req,res,next)=>{
+    const recruiterId=req.user.id;
+    console.log("req recieved");
+    try{
+      const AllJobsCreatedByMe=await Jobs.find({createdBy:recruiterId});
+      res.status(400).json({
+        succecss:true,
+        data:AllJobsCreatedByMe
+      })
+    }catch(err){
+      res.status(500).json({
+        success:false,
+        error:err.message
+      })
+    }
+
+}
+
+
