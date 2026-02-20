@@ -17,7 +17,7 @@ const {
 const { isAuthenticated } = require("../middlewares/auth");
 const { authorizeRole } = require("../middlewares/roleMiddleware");
 
-const applyJobs=require('../controllers/applyJobs');
+const {applyJobs,getAllApplicants}=require('../controllers/applyJobs');
 const uploadResume = require("../middlewares/uploadHandler");
 const applicationValidation = require("../validator/applicationValidator");
 
@@ -39,5 +39,6 @@ Routes.post("/userslogin", authLoginValidator, userLogin);
 
 Routes.post('/application',isAuthenticated,authorizeRole("user"),uploadResume,applicationValidation,applyJobs);
 
-Routes.get('/recruiter/jobspostedbyme',isAuthenticated,jobsPostedByMe);
+Routes.get('/recruiter/jobspostedbyme',isAuthenticated,authorizeRole("recruiter"),jobsPostedByMe);
+Routes.get('/recruiter/:jobsId/applicants',isAuthenticated,authorizeRole('recruiter'),getAllApplicants)
 module.exports = Routes;
