@@ -1,5 +1,6 @@
 const application = require("../models/Application");
 const jobs = require("../models/jobs");
+
 const applyJobs = async (req, res) => {
   const applicationData = req.body;
   const allowedFields = ["job", "name", "email", "coverLetter"];
@@ -18,21 +19,28 @@ const applyJobs = async (req, res) => {
       resumePublicId: fileName,
       applicant: req.user.id,
     });
-    const sucecssApply = await apply.save();
+    const successApply = await apply.save();
     res.status(200).json({
       success: true,
       message: "JobAppplication submitted",
-      data: sucecssApply,
+      data: successApply,
     });
   } catch (err) {
-    return res.status(400).json({
+
+    if(err.code===11000){
+      return res.status(400).json({
+        success:false,
+        message:"you have already applied to this job"
+      })
+    }
+    return res.status(403).json({
       success: false,
       err: err.message,
     });
   }
 };
 const getAllApplicants = async (req, res) => {
-  const jobId = req.params.jobsId;
+  const jobId = req.params.jobId;
   const page = parseInt(req.query.page) || 1;
   const limit = parseInt(req.query.limit) || 20;
   const skip = (page - 1) * limit;
@@ -71,7 +79,7 @@ const getAllApplicants = async (req, res) => {
       error: err.message,
       
     });
-    console.log(err);
+   
   }
 };
 module.exports = {

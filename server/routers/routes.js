@@ -40,5 +40,5 @@ Routes.post("/userslogin", authLoginValidator, userLogin);
 Routes.post('/application',isAuthenticated,authorizeRole("user"),uploadResume,applicationValidation,applyJobs);
 
 Routes.get('/recruiter/jobspostedbyme',isAuthenticated,authorizeRole("recruiter"),jobsPostedByMe);
-Routes.get('/recruiter/:jobsId/applicants',isAuthenticated,authorizeRole('recruiter'),getAllApplicants)
+Routes.get('/recruiter/:jobId/applicants',isAuthenticated,authorizeRole('recruiter'),getAllApplicants)
 module.exports = Routes;

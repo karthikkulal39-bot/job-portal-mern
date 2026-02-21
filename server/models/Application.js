@@ -18,7 +18,6 @@ const applicationSchema=new mongoose.Schema({
     email:{
         type:String,
         required:true,
-        unique:[true, "application with this email already exists"],
         trim:true,   
     },
     coverLetter:{
@@ -47,27 +46,30 @@ const applicationSchema=new mongoose.Schema({
 },{
     timestamps:true
 },)
-applicationSchema.pre('save',async function () {
-    try{
-        const jobExists=await mongoose.model('Jobs').exists({_id:this.job});
 
-        if(!jobExists){
-            throw new Error("Cannnot apply : This job ID does not exists.");
-        }
-        const userExists=await mongoose.model('Users').exists({_id:this.applicant});
-        if(!userExists){
-            throw new Error("Cannot apply : You need to signUp / login before apply")
-        }
-        const alreadyApplied=await mongoose.model('Application').exists({job:this.job,
-            applicant:this.applicant
-        })
-        if(alreadyApplied){
-            throw new Error("You have already applied for this job.");
-        }
-           
-    }catch(error){
-        throw error;
-    }
-    
-});
+applicationSchema.index({job:1,applicant:1},{unique:true});
 module.exports=mongoose.model("Application",applicationSchema)
+
+// applicationSchema.pre('save',async function () {
+//     try{
+//         const jobExists=await mongoose.model('Jobs').exists({_id:this.job});
+
+//         if(!jobExists){
+//             throw new Error("Cannnot apply : This job ID does not exists.");
+//         }
+//         const userExists=await mongoose.model('Users').exists({_id:this.applicant});
+//         if(!userExists){
+//             throw new Error("Cannot apply : You need to signUp / login before apply")
+//         }
+//         const alreadyApplied=await mongoose.model('Application').exists({job:this.job,
+//             applicant:this.applicant
+//         })
+//         if(alreadyApplied){
+//             throw new Error("You have already applied for this job.");
+//         }
+           
+//     }catch(error){
+//         throw error;
+//     }
+    
+// });
