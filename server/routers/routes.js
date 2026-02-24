@@ -17,10 +17,13 @@ const {
 const { isAuthenticated } = require("../middlewares/auth");
 const { authorizeRole } = require("../middlewares/roleMiddleware");
 
-const {applyJobs,getAllApplicants}=require('../controllers/applyJobs');
+const {
+  applyJobs,
+  getAllApplicants,
+  getOneApplication,
+} = require("../controllers/applyJobs");
 const uploadResume = require("../middlewares/uploadHandler");
 const applicationValidation = require("../validator/applicationValidator");
-
 
 Routes.post(
   "/jobs/",
@@ -30,15 +33,53 @@ Routes.post(
   createJob,
 ); // auth to added later.jwt.
 Routes.get("/jobs", getAllJobs);
-Routes.patch("/jobs/:id", isAuthenticated,authorizeRole("recruiter"), updateJobs);
-Routes.delete("/jobs/:id", isAuthenticated,authorizeRole("recruiter"), deleteJob);
-Routes.get("/jobs/:id", isAuthenticated,authorizeRole("recruiter","user"), getOneJob);
+Routes.patch(
+  "/jobs/:id",
+  isAuthenticated,
+  authorizeRole("recruiter"),
+  updateJobs,
+);
+Routes.delete(
+  "/jobs/:id",
+  isAuthenticated,
+  authorizeRole("recruiter"),
+  deleteJob,
+);
+Routes.get(
+  "/jobs/:id",
+  isAuthenticated,
+  authorizeRole("recruiter", "user"),
+  getOneJob,
+);
 
 Routes.post("/usersignup", authSignupValidator, userSignUp);
 Routes.post("/userslogin", authLoginValidator, userLogin);
 
-Routes.post('/application',isAuthenticated,authorizeRole("user"),uploadResume,applicationValidation,applyJobs);
+Routes.post(
+  "/application",
+  isAuthenticated,
+  authorizeRole("user"),
+  uploadResume,
+  applicationValidation,
+  applyJobs,
+);
 
-Routes.get('/recruiter/jobspostedbyme',isAuthenticated,authorizeRole("recruiter"),jobsPostedByMe);
-Routes.get('/recruiter/:jobId/applicants',isAuthenticated,authorizeRole('recruiter'),getAllApplicants)
+Routes.get(
+  "/recruiter/jobspostedbyme",
+  isAuthenticated,
+  authorizeRole("recruiter"),
+  jobsPostedByMe,
+);
+Routes.get(
+  "/recruiter/:jobId/applicants",
+  isAuthenticated,
+  authorizeRole("recruiter"),
+  getAllApplicants,
+);
+Routes.patch(
+  "/recruiter/update/:id",
+  isAuthenticated,
+  authorizeRole("recruiter"),
+  getOneApplication,
+);
 module.exports = Routes;

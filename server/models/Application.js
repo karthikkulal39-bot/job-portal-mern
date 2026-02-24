@@ -48,6 +48,7 @@ const applicationSchema=new mongoose.Schema({
 },)
 
 applicationSchema.index({job:1,applicant:1},{unique:true});
+applicationSchema.index({job:1});
 module.exports=mongoose.model("Application",applicationSchema)
 
 // applicationSchema.pre('save',async function () {
