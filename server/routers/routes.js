@@ -76,8 +76,8 @@ Routes.get(
   authorizeRole("recruiter"),
   getAllApplicants,
 );
-Routes.patch(
-  "/recruiter/update/:id",
+Routes.get(
+  "/recruiter/:id",
   isAuthenticated,
   authorizeRole("recruiter"),
   getOneApplication,
