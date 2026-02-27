@@ -125,7 +125,7 @@ const getOneApplication = async (req, res) => {
       
   //  const applicationData={};
     const result = await checkRecruiterAcess(applicationData, req.user.id);
-console.log(result);
+
     if (result.Error === "NOT_FOUND") {
       return res.status(404).json({
         success: false,
@@ -153,12 +153,44 @@ console.log(result);
   }
 };
 
-const updateAplication=(req,res)=>{
-  
+const updateAplicationStatus=async(req,res)=>{
+  const applicantId=req.params.apId;
+  const {status}=req.body;
+  if(!mongoose.Types.ObjectId.isValid(applicantId)){
+    res.status(400).json({
+      success:false,
+      message:"invalid application"
+    })
+  }
+
+  const appVal=await application.findById(applicantId).populate({
+    path:'job',
+    select:'createdBy'
+  });
+  const data=await checkRecruiterAcess(appVal,req.user.id);
+  if(data.Error==="NOT_FOUND"){
+    return res.status(404).json({
+    success:false,
+    message:'data cant find due to some error'
+    })
+  }
+  if(data.Error==="FORBIDDEN"){
+    
+    return res.status(404).json({
+    success:false,
+    message:'UNAUTHORIZED '
+    })
+  }
+  appVal.status=status;
+  await appVal.save();
+  return res.status(200).json({
+    success:true,
+    updatedVal:appVal
+  })
 }
 module.exports = {
   applyJobs,
   getAllApplicants,
   getOneApplication,
-  updateAplication
+  updateAplicationStatus
 };

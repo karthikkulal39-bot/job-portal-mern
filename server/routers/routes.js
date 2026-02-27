@@ -21,9 +21,11 @@ const {
   applyJobs,
   getAllApplicants,
   getOneApplication,
+  updateAplicationStatus,
 } = require("../controllers/applyJobs");
 const uploadResume = require("../middlewares/uploadHandler");
 const applicationValidation = require("../validator/applicationValidator");
+const { updateStatusVal } = require("../validator/updateStatuValidator");
 
 Routes.post(
   "/jobs/",
@@ -82,4 +84,5 @@ Routes.get(
   authorizeRole("recruiter"),
   getOneApplication,
 );
+Routes.post("recruiter/updateJobStatus/:apID",isAuthenticated,authorizeRole('recruiter'),updateStatusVal,updateAplicationStatus);
 module.exports = Routes;
