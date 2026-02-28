@@ -40,20 +40,7 @@ const applyJobs = async (req, res) => {
     });
   }
 };
-const getAllApplicants = async (req, res) => {
-  const jobId = req.params.jobId;
-  const page = parseInt(req.query.page) || 1;
-  const limit = parseInt(req.query.limit) || 20;
-  const skip = (page - 1) * limit;
-  try {
-    if (isNaN(page) || isNaN(limit) || page < 1 || limit < 1) {
-      return res.status(400).json({
-        success: false,
-        message: "Invalid pagination values",
-      });
-    }
-
-    // const job = await jobs.findById(jobId);
+// const job = await jobs.findById(jobId);
     // if (!job) {
     //   return res.status(404).json({
     //     success: false,
@@ -68,6 +55,20 @@ const getAllApplicants = async (req, res) => {
     //   });
     // }
 
+const getAllApplicants = async (req, res) => {
+  const jobId = req.params.jobId;
+  const page = parseInt(req.query.page) || 1;
+  const limit = parseInt(req.query.limit) || 20;
+  const skip = (page - 1) * limit;
+  try {
+    if (isNaN(page) || isNaN(limit) || page < 1 || limit < 1) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid pagination values",
+      });
+    }
+
+    
     const totalApplicants = await application.countDocuments({ job: jobId });
     const totalPages = Math.ceil(totalApplicants / limit);
 
@@ -162,6 +163,8 @@ const updateAplicationStatus=async(req,res)=>{
       message:"invalid application"
     })
   }
+try{
+
 
   const appVal=await application.findById(applicantId).populate({
     path:'job',
@@ -187,6 +190,15 @@ const updateAplicationStatus=async(req,res)=>{
     success:true,
     updatedVal:appVal
   })
+}
+
+catch(error){
+  return res.status(500).json({
+    success:false,
+    message:"internal server error"
+  })
+
+}
 }
 module.exports = {
   applyJobs,

@@ -1,12 +1,11 @@
 
-const checkRecruiterAcess=async(applicationData,userId)=>{
-   
-   
+const checkRecruiterAcess=(applicationData,userId)=>{
+  
     if(!applicationData || !applicationData.job){
-      return {Error: " NOT_FOUND"};
+      return {Error: "NOT_FOUND"};
     }
     if(userId.toString()!==applicationData.job.createdBy.toString()){
-      return {Error:" FORBIDDEN"};
+      return {Error:"FORBIDDEN"};
     }
     return {success:true}
 };
