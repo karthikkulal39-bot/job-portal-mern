@@ -40,20 +40,7 @@ const applyJobs = async (req, res) => {
     });
   }
 };
-// const job = await jobs.findById(jobId);
-    // if (!job) {
-    //   return res.status(404).json({
-    //     success: false,
-    //     message: "cant find job",
-    //   });
-    // }
 
-    // if (req.user.id.toString() !== job.createdBy.toString()) {
-    //   return res.status(403).json({
-    //     success: false,
-    //     message: "cannot access others job",
-    //   });
-    // }
 
 const getAllApplicants = async (req, res) => {
   const jobId = req.params.jobId;

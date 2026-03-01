@@ -3,14 +3,11 @@ const Jobs = require("../models/jobs");
 
 exports.createJob = async (req, res) => {
   try {
-   
-      const job = await Jobs.create({...req.body,
-        createdBy:req.user.id
-      });
-      return res.status(201).json({
-        success: true,
-        data: job,
-      });
+    const job = await Jobs.create({ ...req.body, createdBy: req.user.id });
+    return res.status(201).json({
+      success: true,
+      data: job,
+    });
   } catch (err) {
     return res.status(500).json({
       success: false,
@@ -21,9 +18,57 @@ exports.createJob = async (req, res) => {
 
 exports.getAllJobs = async (req, res) => {
   try {
-    const allJobs = await Jobs.find();
+    const {
+      search,
+      location,
+      minSalary,
+      maxSalary,
+      jobTypes,
+      experience,
+      pages = 1,
+      limit = 10,
+    } = req.query;
+    const filter = {};
+    if (search) {
+      filter.$or = [
+        { title: { $regex: search, $options: "i" } },
+        { company: { $regex: search, $options: "i" } },
+      ];
+    }
+    if (minSalary || maxSalary) {
+      filter.salary = {};
+      if (minSalary) filter.salary.$gte = Number(minSalary);
+      if (maxSalary) filter.salary.$lte = Number(maxSalary);
+    }
+    if (location) {
+      filter.location = { $regex: location, $options: "i" };
+    }
+    if (jobTypes) {
+      const allowedTypes = ["full-time", "part-time", "internship"];
+      if (jobTypes && !allowedTypes.includes(jobTypes)) {
+        return res
+          .status(400)
+          .json({ success: false, message: "invalid jobType" });
+      }
+      filter.jobType = jobTypes;
+    }
+    if (experience) {
+      filter.experience = Number(experience);
+    }
+
+    const skip=(pages-1)*limit;
+    const tPages=await Jobs.countDocuments(filter);
+    const totalPage=Math.ceil(tPages/limit);
+
+    const allJobs = await Jobs.find(filter)
+    .skip(skip)
+    .limit(limit)
+    .sort(-1);
+
     return res.status(200).json({
       success: true,
+      totalPages:totalPage,
+      currentPage:pages,
       data: allJobs,
     });
   } catch (err) {
@@ -37,13 +82,12 @@ exports.getAllJobs = async (req, res) => {
 exports.updateJobs = async (req, res) => {
   const updateData = req.body;
   const id = req.params.id;
-  const jobs=await Jobs.findById(id);
-  if(jobs.createdBy.toString()!==req.user.id){
+  const jobs = await Jobs.findById(id);
+  if (jobs.createdBy.toString() !== req.user.id) {
     return res.status(400).json({
-      sucecss:false,
-      message:"cannnot update other's "
-    })
-
+      sucecss: false,
+      message: "cannnot update other's ",
+    });
   }
   const allowedUpdates = [
     "title",
@@ -86,12 +130,12 @@ exports.updateJobs = async (req, res) => {
 
 exports.deleteJob = async (req, res) => {
   const id = req.params.id;
-  const jobs=await Jobs.findById(id);
-  if(jobs.createdBy!==req.user.id){
+  const jobs = await Jobs.findById(id);
+  if (jobs.createdBy !== req.user.id) {
     return res.status(400).json({
-      success : false,
-      message:"cannot delete someones jobs post"
-    })
+      success: false,
+      message: "cannot delete someones jobs post",
+    });
   }
   try {
     const deleteData = await Jobs.findByIdAndDelete({ _id: id });
@@ -131,22 +175,19 @@ exports.getOneJob = async (req, res) => {
   }
 };
 
-exports.jobsPostedByMe = async(req,res,next)=>{
-    const recruiterId=req.user.id;
-    console.log("req recieved");
-    try{
-      const AllJobsCreatedByMe=await Jobs.find({createdBy:recruiterId});
-      res.status(400).json({
-        succecss:true,
-        data:AllJobsCreatedByMe
-      })
-    }catch(err){
-      res.status(500).json({
-        success:false,
-        error:err.message
-      })
-    }
-
-}
-
-
+exports.jobsPostedByMe = async (req, res, next) => {
+  const recruiterId = req.user.id;
+  console.log("req recieved");
+  try {
+    const AllJobsCreatedByMe = await Jobs.find({ createdBy: recruiterId });
+    res.status(400).json({
+      succecss: true,
+      data: AllJobsCreatedByMe,
+    });
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      error: err.message,
+    });
+  }
+};
