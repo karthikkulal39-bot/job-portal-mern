@@ -1,8 +1,12 @@
 
+const company = require("../models/company");
 const Jobs = require("../models/jobs");
 
 exports.createJob = async (req, res) => {
   try {
+    const comp=await company.find({
+      
+    })
     const job = await Jobs.create({ ...req.body, createdBy: req.user.id });
     return res.status(201).json({
       success: true,
@@ -62,7 +66,7 @@ exports.getAllJobs = async (req, res) => {
 
     const allJobs = await Jobs.find(filter)
     .skip(skip)
-    .limit(limit)
+    .limit(limit) 
     .sort(-1);
 
     return res.status(200).json({

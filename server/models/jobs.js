@@ -7,9 +7,8 @@ const jobSchema = new mongoose.Schema(
       trim: true,
     },
     company: {
-      type: String,
-      required: true,
-      trim: true,
+      type: mongoose.Schema.Types.ObjectId,
+      ref : 'Company'
     },
     location: {
       type: String,

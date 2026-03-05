@@ -23,7 +23,7 @@ const viewAllAppliedJobs=async(req,res)=>{
 
     try{
        if(req.query.status){
-        filter.status=req.query.filter;
+        filter.status=req.query.status;
        }
        
       

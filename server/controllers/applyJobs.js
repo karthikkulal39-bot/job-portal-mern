@@ -69,7 +69,7 @@ const getAllApplicants = async (req, res) => {
         path:'job',
         select:'createdBy'
       });
-      const result= await checkRecruiterAcess(applications,req.user.id);
+      const result=  checkRecruiterAcess(applications,req.user.id);
       if(result.Error==="NOT_FOUND"){
         return res.status(404).json({
           success:false,
@@ -151,13 +151,11 @@ const updateAplicationStatus=async(req,res)=>{
     })
   }
 try{
-
-
   const appVal=await application.findById(applicantId).populate({
     path:'job',
     select:'createdBy'
   });
-  const data=await checkRecruiterAcess(appVal,req.user.id);
+  const data= checkRecruiterAcess(appVal,req.user.id);
   if(data.Error==="NOT_FOUND"){
     return res.status(404).json({
     success:false,
