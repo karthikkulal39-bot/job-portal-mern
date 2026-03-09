@@ -26,6 +26,9 @@ const {
 const uploadResume = require("../middlewares/uploadHandler");
 const applicationValidation = require("../validator/applicationValidator");
 const { updateStatusVal } = require("../validator/updateStatuValidator");
+const { registerCompany } = require("../controllers/recruiterPanel");
+
+Routes.post("/registerCompany",isAuthenticated,registerCompany);
 
 Routes.post(
   "/jobs/",
@@ -33,7 +36,8 @@ Routes.post(
   authorizeRole("recruiter"),
   createJobValidator,
   createJob,
-); // auth to added later.jwt.
+);
+ // auth to added later.jwt.
 Routes.get("/jobs", getAllJobs);
 Routes.patch(
   "/jobs/:id",
