@@ -54,3 +54,59 @@ exports.userLogin = async (req, res) => {
     });
   }
 };
+
+exports.logOut = (req, res) => {
+  try {
+    res.clearCookie("token", {
+      httpOnly: true,
+      secure: true,
+      sameSite: "strict",
+    });
+    return res.status(200).json({
+      success: true,
+      message: "logged Out sucessfully",
+    });
+  } catch (err) {
+    return res.status(500).json({
+      success: false,
+      message: "internal server error",
+    });
+  }
+};
+exports.changePassword = async (req, res) => {
+  const { oldPassword, newPassword } = req.body;
+  const userId = req.user.id;
+
+  try {
+    if (oldPassword === newPassword) {
+      return res.status(400).json({
+        success: false,
+        message: "newPassword must be different",
+      });
+    }
+    const user = await users.findById(userId);
+    if (!user) {
+      return res
+        .status(404)
+        .json({ success: false, message: "user cant find" });
+    }
+
+    const checkOldPass = await comparePass(oldPassword, userDBPass);
+    if (!checkOldPass) {
+      return res.status(401).json({
+        sucecss: false,
+        message: "password changing failed",
+      });
+    }
+    user.password = newPassword;
+    await user.save();
+    return res.status(200).json({
+      success: true,
+      message: "password changed successfully",
+    });
+  } catch (error) {
+    return res
+      .status(404)
+      .json({ sucess: false, message: "problme while changing password" });
+  }
+};

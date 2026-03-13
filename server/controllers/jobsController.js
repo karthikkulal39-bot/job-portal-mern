@@ -1,13 +1,36 @@
-
+const { default: mongoose } = require("mongoose");
 const company = require("../models/company");
 const Jobs = require("../models/jobs");
 
 exports.createJob = async (req, res) => {
   try {
-    const comp=await company.find({
-      
-    })
-    const job = await Jobs.create({ ...req.body, createdBy: req.user.id });
+    const companyId=req.body.companyId;
+    if(!mongoose.Types.ObjectId.isValid(companyId)){
+      return res.status(200).json({
+        success:false,
+        message:"invalid company id"
+      })
+    }
+    const company=await company.findById(companyId);
+    if(!companyExists){
+      return res.status(404).json({
+        success:false,
+        message:"cant find your company or register your company."
+      })
+    }
+    if(
+      company.createdBy.toString()!==req.user.id && !company.recruiter.includes(req.user.id)
+
+    ){
+      return res.status(403).json({
+        success:false,
+        message:"Not authorized for post job for this company"
+      })
+    }
+    const job = await Jobs.create({ ...req.body, 
+                                    company:companyId,
+                                    createdBy: req.user.id });
+
     return res.status(201).json({
       success: true,
       data: job,
@@ -15,7 +38,7 @@ exports.createJob = async (req, res) => {
   } catch (err) {
     return res.status(500).json({
       success: false,
-      message: err.message,
+      message: err.message
     });
   }
 };
@@ -90,7 +113,7 @@ exports.updateJobs = async (req, res) => {
   if (jobs.createdBy.toString() !== req.user.id) {
     return res.status(400).json({
       sucecss: false,
-      message: "cannnot update other's ",
+      message: "cannnot update other's jobs",
     });
   }
   const allowedUpdates = [
@@ -110,7 +133,7 @@ exports.updateJobs = async (req, res) => {
     }
   });
   if (Object.keys(allowedResult).length === 0) {
-    return res.status(400).json({ message: "No valid fields" });
+    return res.status(400).json({success:false, message: "No valid fields" });
   }
 
   try {
@@ -144,7 +167,6 @@ exports.deleteJob = async (req, res) => {
   try {
     const deleteData = await Jobs.findByIdAndDelete({ _id: id });
 
-    console.log(deleteData);
     if (!deleteData) {
       return res.status(403).json({
         success: false,
@@ -166,7 +188,17 @@ exports.deleteJob = async (req, res) => {
 exports.getOneJob = async (req, res) => {
   const jobId = req.params.id;
   try {
-    const job = await Jobs.findOne({ _id: jobId });
+    if(!mongoose.Types.ObjectId.isValid(jobId)){
+      return res.status(404).json({sucecss:false,message:"invalid job id"})
+    }
+
+    const job = await Jobs.findById({ _id: jobId });
+    if(!job){
+      return res.status(404).json({
+        success:false,
+        message:"Page not Found"
+      })
+    }
     res.status(200).json({
       success: true,
       data: job,

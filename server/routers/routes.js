@@ -9,10 +9,11 @@ const {
   jobsPostedByMe,
 } = require("../controllers/jobsController");
 const { createJobValidator } = require("../validator/createJobValidator");
-const { userSignUp, userLogin } = require("../controllers/authController");
+const { userSignUp, userLogin, logOut, changePassword } = require("../controllers/authController");
 const {
   authSignupValidator,
   authLoginValidator,
+  changePasswordValidator,
 } = require("../validator/authValidator");
 const { isAuthenticated } = require("../middlewares/auth");
 const { authorizeRole } = require("../middlewares/roleMiddleware");
@@ -27,6 +28,7 @@ const uploadResume = require("../middlewares/uploadHandler");
 const applicationValidation = require("../validator/applicationValidator");
 const { updateStatusVal } = require("../validator/updateStatuValidator");
 const { registerCompany } = require("../controllers/recruiterPanel");
+const { getMyDetail } = require("../controllers/userDashboardController");
 
 Routes.post("/registerCompany",isAuthenticated,registerCompany);
 
@@ -52,7 +54,7 @@ Routes.delete(
   deleteJob,
 );
 Routes.get(
-  "/jobs/:id",
+  "/jobs/getme/:id",
   isAuthenticated,
   authorizeRole("recruiter", "user"),
   getOneJob,
@@ -89,4 +91,9 @@ Routes.get(
   getOneApplication,
 );
 Routes.post("recruiter/updateJobStatus/:apID",isAuthenticated,authorizeRole('recruiter'),updateStatusVal,updateAplicationStatus);
+Routes.get('/mydetail',isAuthenticated,getMyDetail);
+
+Routes.post('/auth/logout',isAuthenticated,logOut);
+Routes.patch('/auth/change-password',isAuthenticated,changePasswordValidator,changePassword);
+
 module.exports = Routes;

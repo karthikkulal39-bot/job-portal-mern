@@ -4,9 +4,10 @@ exports.createJobValidator = [
   body("title").trim().notEmpty().withMessage("Job title cannot be empty"),
 
   body("company")
+  .trim()
     .notEmpty()
     .withMessage("company Name cannot be Empty ")
-    .trim(),
+    ,
 
   body("location")
     .notEmpty()
@@ -51,19 +52,47 @@ exports.createJobValidator = [
     .withMessage("this accepts only boolean true or false")
     .toBoolean(),
 
+  body("companyId")
+  .notEmpty()
+  .withMessage("provide your companyId or create a company before creating jobs")
+  .trim(),
+
+  
   (req, res, next) => {
     const errors = validationResult(req);
     //error returns an object if error is there 
     //.isempty is false we need true to enter 
     if(!errors.isEmpty()){
-      return res.status(400).json({
+      return res.status 
+      (400).json({
         success:false,
+        message:"validation error",
         errors:errors.array()
       });
 
     }
-    next()
 
- 
+    // only allow defined fields 
+    const allowed = [
+      "title",
+      "company",
+      "location",
+      "salary",
+      "jobType",
+      "minExperience",
+      "skills",
+      "description",
+      "isActive",
+      "companyId",
+    ];
+
+    req.body = allowed.reduce((obj,key)=>{
+      if(req.body.hasOwnProperty(key)){
+         obj[key]=req.body[key];
+      }
+      return obj;
+    },{})
+
+    next();
   },
 ];

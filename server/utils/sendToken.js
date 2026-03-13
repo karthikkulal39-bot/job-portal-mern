@@ -14,7 +14,7 @@ const sendToken = (foundUser, res) => {
     secure: true,
     sameSite: "Strict",
   });
-  res.status(200).json({
+  return res.status(200).json({
     success: true,
     token,
     user: {

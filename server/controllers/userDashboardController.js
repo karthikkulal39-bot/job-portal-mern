@@ -1,4 +1,5 @@
 const Application = require("../models/Application");
+const users = require("../models/users");
 
 const viewAllAppliedJobs=async(req,res)=>{
     const userId=req.user.id;
@@ -59,6 +60,32 @@ const viewAllAppliedJobs=async(req,res)=>{
         })
     }
 }
+
+const getMyDetail = async (req, res) => {
+  const userId = req.user.id;
+
+  try {
+    const myDetail = await users.findById( userId ).select("-password").lean();
+    if(!myDetail){
+      return res.status(404).json({
+        success:false,
+        message:"can find user"
+      })
+       
+    }
+    return res.status(200).json({
+      success:true,
+      message:"your data",
+      data:myDetail
+    })
+  } catch (error) {
+    return res.status(500).json({
+      success:false,
+      message:"interal server error"
+    })
+  } 
+};
 module.exports={
-    viewAllAppliedJobs
+    viewAllAppliedJobs,
+    getMyDetail
 }
