@@ -13,7 +13,7 @@ exports.authLoginValidator = [
     const err = validationResult(req);
 
     if (!err.isEmpty()) {
-      return res.status(501).json({
+      return res.status(400).json({
         success: false,
         error: err.array(),
       });

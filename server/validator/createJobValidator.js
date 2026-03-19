@@ -69,7 +69,6 @@ exports.createJobValidator = [
         message:"validation error",
         errors:errors.array()
       });
-
     }
 
     // only allow defined fields 

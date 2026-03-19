@@ -28,7 +28,9 @@ const uploadResume = require("../middlewares/uploadHandler");
 const applicationValidation = require("../validator/applicationValidator");
 const { updateStatusVal } = require("../validator/updateStatuValidator");
 const { registerCompany } = require("../controllers/recruiterPanel");
-const { getMyDetail } = require("../controllers/userDashboardController");
+const { getMyDetail, updateProfile } = require("../controllers/userDashboardController");
+const { updateProfileValidator } = require("../validator/updateProfileValidator");
+const { checkAppliedForJob } = require("../middlewares/checkJobApplied");
 
 Routes.post("/registerCompany",isAuthenticated,registerCompany);
 
@@ -67,6 +69,7 @@ Routes.post(
   "/application",
   isAuthenticated,
   authorizeRole("user"),
+  checkAppliedForJob,
   uploadResume,
   applicationValidation,
   applyJobs,
@@ -95,5 +98,7 @@ Routes.get('/mydetail',isAuthenticated,getMyDetail);
 
 Routes.post('/auth/logout',isAuthenticated,logOut);
 Routes.patch('/auth/change-password',isAuthenticated,changePasswordValidator,changePassword);
+
+Routes.patch('/update-profile/:id',isAuthenticated,authorizeRole("user","recruiter"),updateProfileValidator,updateProfile);
 
 module.exports = Routes;

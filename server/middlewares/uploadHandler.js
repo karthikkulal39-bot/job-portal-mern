@@ -10,5 +10,15 @@ const uploadResume=(req,res,next)=>{
         }
         next();
     })
+    // const worker=uploads.single('resume');
+    // worker(req,res,(err)=>{
+    //     if(err){
+    //         return res.status(400).json({
+    //             success:false,
+    //             message:err.message
+    //         })
+    //     }
+    //     next();
+    // })
 }
 module.exports=uploadResume;

@@ -63,7 +63,6 @@ const viewAllAppliedJobs=async(req,res)=>{
 
 const getMyDetail = async (req, res) => {
   const userId = req.user.id;
-
   try {
     const myDetail = await users.findById( userId ).select("-password").lean();
     if(!myDetail){
@@ -85,7 +84,43 @@ const getMyDetail = async (req, res) => {
     })
   } 
 };
+
+const updateProfile=async(req,res)=>{
+    const userId=req.params.id; //may error
+    const {firstname,lastname,email}=req.cleanedData;
+    try {
+        if(userId.toString()!==req.user.id.toString()){
+            return res.status(403).json({
+                success:false,
+                message:"Forbidden"
+            })
+        }
+        
+        const updatedData=await users.findByIdAndUpdate(userId,req.cleanedData,{new:true,runValidators:true}).select('-password');
+        if(!updatedData){
+            return res.status(404).json({
+                success:false,
+                message:"cant find user"
+            })
+        }
+        
+        return res.status(200).json({
+            success:true,
+            message:"updated data successfully",
+            data:updatedData
+        })
+        
+
+    } catch (error) {
+        res.status(500).json({
+            success:false,
+            message:"internal server error"
+        })
+    }
+
+}
 module.exports={
     viewAllAppliedJobs,
-    getMyDetail
+    getMyDetail,
+    updateProfile
 }

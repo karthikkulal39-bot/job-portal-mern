@@ -10,8 +10,6 @@ exports.registerCompany=async(req,res)=>{
     });
     try{
         const isExists=await company.exists({slug:data.slug});
-        
-        
         if(isExists){
             return res.status(409).json({
                 success:false,

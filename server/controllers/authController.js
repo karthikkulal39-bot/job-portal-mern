@@ -38,7 +38,8 @@ exports.userLogin = async (req, res) => {
         message: "Invalid credentials",
       });
     }
-    const isMatch = comparePass(password, foundUser.password);
+    const isMatch = await comparePass(password, foundUser.password);
+    // console.log(isMatch);
     if (isMatch) {
       sendToken(foundUser, res);
     } else {
@@ -76,7 +77,6 @@ exports.logOut = (req, res) => {
 exports.changePassword = async (req, res) => {
   const { oldPassword, newPassword } = req.body;
   const userId = req.user.id;
-
   try {
     if (oldPassword === newPassword) {
       return res.status(400).json({
@@ -84,18 +84,18 @@ exports.changePassword = async (req, res) => {
         message: "newPassword must be different",
       });
     }
-    const user = await users.findById(userId);
+    const user = await users.findById(userId).select("+password");
     if (!user) {
       return res
         .status(404)
-        .json({ success: false, message: "user cant find" });
+        .json({ success: false, message: "user not find" });
     }
 
-    const checkOldPass = await comparePass(oldPassword, userDBPass);
+    const checkOldPass = await comparePass(oldPassword, user.password);
     if (!checkOldPass) {
       return res.status(401).json({
-        sucecss: false,
-        message: "password changing failed",
+        success: false,
+        message: "old password is wrong",
       });
     }
     user.password = newPassword;
@@ -105,8 +105,9 @@ exports.changePassword = async (req, res) => {
       message: "password changed successfully",
     });
   } catch (error) {
+    // console.log("change password error:",error)
     return res
-      .status(404)
-      .json({ sucess: false, message: "problme while changing password" });
+      .status(500)
+      .json({ success: false, message: "problem while changing password" });
   }
 };
