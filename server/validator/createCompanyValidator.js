@@ -53,6 +53,13 @@ const companyValidator=[
                 errors: errors.array()
             });
         }
+        if(!req.file){
+            return res.status(400).json({
+                success:false,
+                message:"upload logo of your company"
+
+            })
+        }
         next();
     }
 ]

@@ -31,8 +31,14 @@ const { registerCompany } = require("../controllers/recruiterPanel");
 const { getMyDetail, updateProfile } = require("../controllers/userDashboardController");
 const { updateProfileValidator } = require("../validator/updateProfileValidator");
 const { checkAppliedForJob } = require("../middlewares/checkJobApplied");
+const { uploadLogo } = require("../middlewares/logoUpload");
+const companyValidator = require("../validator/createCompanyValidator");
+const { checkCompanyExists } = require("../middlewares/checkCompanyExist");
 
-Routes.post("/registerCompany",isAuthenticated,registerCompany);
+//routes starts..-->
+
+Routes.post("/registerCompany",isAuthenticated,uploadLogo,
+  authorizeRole("user","recruiter"),checkCompanyExists,companyValidator,registerCompany);
 
 Routes.post(
   "/jobs/",

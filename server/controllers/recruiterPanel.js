@@ -1,7 +1,8 @@
 ﻿const company = require("../models/company");
+const uploadToCloudinary = require("../utils/uploadToCLoudinary");
 
 exports.registerCompany=async(req,res)=>{
-    const allowedFields=['name','slug','description','website','location','logo','foundedYear','recruiters'];
+    const allowedFields=['name','slug','description','website','location','foundedYear','recruiters'];
     const data={};
     allowedFields.forEach((ele)=>{
         if(req.body[ele]!==undefined){
@@ -9,6 +10,15 @@ exports.registerCompany=async(req,res)=>{
         }
     });
     try{
+        
+        let logoData=null;
+        if(req.file){
+            const result=await uploadToCloudinary(req.file.buffer,'logos');
+            logoData={
+                url:result.secure_url,
+                public_id:result.public_id
+            }
+        }
         const isExists=await company.exists({slug:data.slug});
         if(isExists){
             return res.status(409).json({
@@ -19,6 +29,7 @@ exports.registerCompany=async(req,res)=>{
         const companyReg=await company.insertOne({
             ...data,
             createdBy:req.user.id,
+            logo:logoData
         })
 
         return res.status(201).json({
