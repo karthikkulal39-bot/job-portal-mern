@@ -27,7 +27,7 @@ const {
 const uploadResume = require("../middlewares/uploadHandler");
 const applicationValidation = require("../validator/applicationValidator");
 const { updateStatusVal } = require("../validator/updateStatuValidator");
-const { registerCompany } = require("../controllers/recruiterPanel");
+const { registerCompany, recruitersAllCompanies } = require("../controllers/recruiterPanel");
 const { getMyDetail, updateProfile } = require("../controllers/userDashboardController");
 const { updateProfileValidator } = require("../validator/updateProfileValidator");
 const { checkAppliedForJob } = require("../middlewares/checkJobApplied");
@@ -106,5 +106,7 @@ Routes.post('/auth/logout',isAuthenticated,logOut);
 Routes.patch('/auth/change-password',isAuthenticated,changePasswordValidator,changePassword);
 
 Routes.patch('/update-profile/:id',isAuthenticated,authorizeRole("user","recruiter"),updateProfileValidator,updateProfile);
+
+Routes.get('/get-all-recruiters-companies',isAuthenticated,authorizeRole('recruiter'),recruitersAllCompanies);
 
 module.exports = Routes;

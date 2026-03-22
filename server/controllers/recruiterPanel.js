@@ -1,4 +1,5 @@
-﻿const company = require("../models/company");
+﻿const { default: mongoose } = require("mongoose");
+const company = require("../models/company");
 const uploadToCloudinary = require("../utils/uploadToCLoudinary");
 
 exports.registerCompany=async(req,res)=>{
@@ -51,6 +52,19 @@ exports.registerCompany=async(req,res)=>{
 
 
 };
-exports.getAllCompany=(req,res)=>{
+exports.recruitersAllCompanies=async(req,res)=>{
+        try{
+            const companies=await company.find({recruiters:new mongoose.Types.ObjectId(req.user.id)}).sort({createdAt:-1});
+            if(companies.length===0){
+                return res.status(404).json({success:false,message:"your are not recruiter of any company"})
+            }
+            return res.status(200).json({
+                success:true,
+                data:companies
+            })
 
+        }catch(err){
+            return res.status(500).json({success:false,message:"internal server error"})
+        }
+      
 }
