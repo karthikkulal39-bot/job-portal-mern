@@ -1,27 +1,51 @@
 const jwt = require("jsonwebtoken");
-
-const sendToken = (foundUser, res) => {
-  const token = jwt.sign(
+const Session=require('../models/authModel');
+const sendToken = async(User,req, res) => {
+  try{  
+  const accessToken = jwt.sign(
     {
-      id: foundUser._id,
-      role: foundUser.role,
+      _id: User._id,
+      role: User.role,
     },
     process.env.JWT_SECRET,
-    { expiresIn: process.env.TOKEN_EXPIRE },
+    { expiresIn: '15m' },
   );
-  res.cookie("token", token, {
+  const refreshToken=jwt.sign({
+    _id:User._id,
+    role:User.role
+  },
+  process.env.JWT_SECRET,
+  {
+    expiresIn:'7d'
+  });
+ 
+  const sessionSave=new Session({
+    userId:User._id,
+    refreshToken:refreshToken,
+    userAgent:req.headers['user-agent'],
+    clientIp:req.ip,
+  }) 
+  sessionSave.save();
+
+  res.cookie("refreshToken", refreshToken, {
     httpOnly: true,
     secure: true,
     sameSite: "Strict",
   });
   return res.status(200).json({
     success: true,
-    token,
+    accessToken,
     user: {
-      id: foundUser._id,
-      email: foundUser.email,
-      role: foundUser.usertype,
+      id: User._id,
+      email: User.email,
+      role: User.usertype,
     },
   });
+}catch(err){
+  res.status(501).json({
+    success:false,
+    message:err.message
+  })
+}
 };
 module.exports = sendToken;

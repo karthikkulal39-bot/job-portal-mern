@@ -15,9 +15,10 @@ const {
   getAllApplicants,
   getOneApplication,
   updateAplicationStatus,
-} = require("../controllers/applyJobs");
+  registerCompany,
+  recruitersAllCompanies,
+} = require("../controllers/recruiterPanel");
 const { updateStatusVal } = require("../validator/updateStatuValidator");
-const { registerCompany, recruitersAllCompanies } = require("../controllers/recruiterPanel");
 const { uploadLogo } = require("../middlewares/logoUpload");
 const companyValidator = require("../validator/createCompanyValidator");
 const { checkCompanyExists } = require("../middlewares/checkCompanyExist");

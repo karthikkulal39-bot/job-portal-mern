@@ -13,7 +13,7 @@ const companyValidator = require('../validator/createCompanyValidator');
 const userRoutes=express.Router();
 
 // User routes
-userRoutes.get('/mydetail', isAuthenticated, getMyDetail);
+userRoutes.get('/mydetail', isAuthenticated,authorizeRole("user","recruiter"), getMyDetail);
 userRoutes.patch('/update-profile/:id', isAuthenticated, authorizeRole("user","recruiter"), updateProfileValidator, updateProfile);
 userRoutes.post('/user/viewappliedjob', isAuthenticated, authorizeRole("user"), companyValidator, viewAllAppliedJobs);
 userRoutes.post(

@@ -112,13 +112,14 @@ const updateProfile=async(req,res)=>{
         
 
     } catch (error) {
-        res.status(500).json({
+        return res.status(500).json({
             success:false,
             message:"internal server error"
         })
     }
 
 }
+
 module.exports={
     viewAllAppliedJobs,
     getMyDetail,

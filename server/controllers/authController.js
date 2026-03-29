@@ -1,8 +1,9 @@
 const users = require("../models/users");
-const jwt = require("jsonwebtoken");
-const bcrypt = require("bcryptjs");
+const bcrypt=require('bcryptjs')
 const { comparePass } = require("../utils/comparedHashPAss");
+const decodeJWT=require('../utils/decodeJWT')
 const sendToken = require("../utils/sendToken");
+const Session=require('../models/authModel');
 
 exports.userSignUp = async (req, res) => {
   const userdata = req.body;
@@ -30,24 +31,26 @@ exports.userSignUp = async (req, res) => {
 
 exports.userLogin = async (req, res) => {
   const { email, password } = req.body;
+  
   try {
     const foundUser = await users.findOne({ email: email });
+    // console.log(foundUser);
     if (!foundUser) {
       return res.status(401).json({
         success: false,
-        message: "Invalid credentials",
+        message: "Invalid credentials ",
       });
     }
-    const isMatch = await comparePass(password, foundUser.password);
-    // console.log(isMatch);
-    if (isMatch) {
-      sendToken(foundUser, res);
-    } else {
+   
+    const isMatch = await comparePass(password, foundUser.password)
+    if (!isMatch) {
       return res.status(401).json({
         success: false,
         message: "Invalid credentials",
       });
-    }
+    } 
+    return sendToken(foundUser,req, res);
+    
   } catch (error) {
     return res.status(500).json({
       success: false,
@@ -55,6 +58,53 @@ exports.userLogin = async (req, res) => {
     });
   }
 };
+
+exports.refreshYourTokens=async (req,res)=>{
+  try{
+    
+    const {refreshToken}=req.cookies;
+    if(!refreshToken){
+      res.status(401).json({
+        success:false,
+        message:"unauthorised"
+      })
+    }
+    const oldData=await Session.findOne({refreshToken}).select('+ refreshToken');
+    
+    if(!oldData){
+      return res.status(401).json({
+        success:false,
+        message:"token expired. login again"
+      })
+    }
+
+
+    if(refreshToken.toString() !== oldData.refreshToken.toString()){
+      return res.status(401).json({
+        success:false,
+        message:"invalid Tokens"
+      })
+    }
+    const deleteData=await Session.findOneAndDelete({refreshToken:refreshToken})
+    const verifyTokenData=decodeJWT(refreshToken,process.env.JWT_SECRET);
+
+    if(!verifyTokenData){
+      return res.status(403).json({
+        success:false,
+        message:"invalid token"
+      })
+    }
+    sendToken(verifyTokenData,req,res);
+  }catch(err){
+    res.status(501).json({
+      success:false,
+      message:err.message
+    })
+  }
+}
+
+
+
 
 exports.logOut = (req, res) => {
   try {

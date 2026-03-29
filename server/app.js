@@ -26,12 +26,4 @@ app.listen(process.env.PORT, () => {
   }
 }); 
 
-app.listen(process.env.PORT, () => {
-  try{
-    connectDB();
-    console.log(`server is listening in port no ${process.env.PORT}`);
-  }
-  catch(err){
-    console.log(err);
-  }
-});
+
