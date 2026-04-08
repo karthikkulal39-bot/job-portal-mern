@@ -1,5 +1,4 @@
 const users = require("../models/users");
-const bcrypt=require('bcryptjs')
 const { comparePass } = require("../utils/comparedHashPAss");
 const decodeJWT=require('../utils/decodeJWT')
 const sendToken = require("../utils/sendToken");
@@ -64,12 +63,12 @@ exports.refreshYourTokens=async (req,res)=>{
     
     const {refreshToken}=req.cookies;
     if(!refreshToken){
-      res.status(401).json({
+      return res.status(401).json({
         success:false,
         message:"unauthorised"
       })
     }
-    const oldData=await Session.findOne({refreshToken}).select('+ refreshToken');
+    const oldData=await Session.findOne({refreshToken,revoke:false}).select('+refreshToken');
     
     if(!oldData){
       return res.status(401).json({
@@ -85,8 +84,7 @@ exports.refreshYourTokens=async (req,res)=>{
         message:"invalid Tokens"
       })
     }
-    const deleteData=await Session.findOneAndDelete({refreshToken:refreshToken})
-    const verifyTokenData=decodeJWT(refreshToken,process.env.JWT_SECRET);
+    const verifyTokenData=decodeJWT(refreshToken);
 
     if(!verifyTokenData){
       return res.status(403).json({
@@ -94,7 +92,16 @@ exports.refreshYourTokens=async (req,res)=>{
         message:"invalid token"
       })
     }
-    sendToken(verifyTokenData,req,res);
+
+    if(verifyTokenData._id.toString() !== oldData.userId.toString()){
+      return res.status(401).json({
+        success:false,
+        message:"invalid token owner"
+      })
+    }
+
+    await Session.findByIdAndUpdate(oldData._id,{revoke:true});
+    return sendToken(verifyTokenData,req,res);
   }catch(err){
     res.status(501).json({
       success:false,
@@ -102,13 +109,43 @@ exports.refreshYourTokens=async (req,res)=>{
     })
   }
 }
+exports.logOutFromAll=async(req,res)=>{
+  try{
+    const userId=req.user.id;
+    await Session.updateMany(
+      {userId,revoke:false},
+      {revoke:true}
+    )
+
+    res.clearCookie("refreshToken", {
+      httpOnly: true,
+      secure: true,
+      sameSite: "strict",
+    });
+
+    return res.status(200).json({
+      success:true,
+      message:"logged out from all devices"
+    })
+  }catch(err){
+    return res.status(500).json({
+      success:false,
+      message:"internal server error"
+    })
+  }
+}
 
 
 
 
-exports.logOut = (req, res) => {
+exports.logOut = async (req, res) => {
   try {
-    res.clearCookie("token", {
+    const {refreshToken}=req.cookies;
+    if(refreshToken){
+      await Session.findOneAndUpdate({refreshToken},{revoke:true});
+    }
+
+    res.clearCookie("refreshToken", {
       httpOnly: true,
       secure: true,
       sameSite: "strict",

@@ -4,11 +4,11 @@ const sendToken = async(User,req, res) => {
   try{  
   const accessToken = jwt.sign(
     {
-      _id: User._id,
+      _id: User._id ,
       role: User.role,
     },
     process.env.JWT_SECRET,
-    { expiresIn: '15m' },
+    { expiresIn: '5m' },
   );
   const refreshToken=jwt.sign({
     _id:User._id,

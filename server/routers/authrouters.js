@@ -1,6 +1,6 @@
 const express = require("express");
 const authRoutes = express.Router();
-const { userSignUp, userLogin, logOut, changePassword, refreshYourTokens } = require("../controllers/authController");
+const { userSignUp, userLogin, logOut, logOutFromAll, changePassword, refreshYourTokens } = require("../controllers/authController");
 const {
   authSignupValidator,
   authLoginValidator,
@@ -8,7 +8,7 @@ const {
 } = require("../validator/authValidator");
 const { isAuthenticated } = require("../middlewares/auth");
 
-// Auth routes
+
 authRoutes.post("/usersignup", authSignupValidator, userSignUp);
 
 
@@ -18,6 +18,8 @@ authRoutes.get("/refreshToken",refreshYourTokens);
 
 
 authRoutes.post('/auth/logout', isAuthenticated, logOut);
+
+authRoutes.post('/auth/logout-all', isAuthenticated, logOutFromAll);
 
 
 authRoutes.patch('/auth/change-password', isAuthenticated, changePasswordValidator, changePassword);
