@@ -9,7 +9,7 @@ exports.checkCompanyExists=async(req,res,next)=>{
         slug:slug
     });
     if(isExists){
-        return res.status(509).json({
+        return res.status(409).json({
             success:false,
             message:"company already created by this slug and user"
         })

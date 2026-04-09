@@ -26,6 +26,11 @@ const userschema = new mongoose.Schema(
       required: true,
       default: "user",
     },
+    verified:{
+      type:Boolean,
+      enum:[true,false],
+      default:false
+    },
   },
   { timestamps: true },
 );

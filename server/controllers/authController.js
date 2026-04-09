@@ -4,6 +4,8 @@ const decodeJWT=require('../utils/decodeJWT')
 const sendToken = require("../utils/sendToken");
 const Session=require('../models/authModel');
 
+const generateOtp=require('../utils/generateOTP');
+
 exports.userSignUp = async (req, res) => {
   const userdata = req.body;
   const allowedFeilds = ["firstname", "lastname", "email", "password", "role"];
@@ -14,6 +16,8 @@ exports.userSignUp = async (req, res) => {
     }
   });
   try {
+    const otp=generateOtp();
+   
     const user = new users(allowedValues);
     const { firstname, lastname, email, usertype } = await user.save();
     return res.status(201).json({
@@ -21,7 +25,7 @@ exports.userSignUp = async (req, res) => {
       data: { firstname, lastname, email, usertype },
     });
   } catch (error) {
-    return res.status(501).json({
+    return res.status(500).json({
       success: false,
       message: error.message,
     });
@@ -103,7 +107,7 @@ exports.refreshYourTokens=async (req,res)=>{
     await Session.findByIdAndUpdate(oldData._id,{revoke:true});
     return sendToken(verifyTokenData,req,res);
   }catch(err){
-    res.status(501).json({
+    res.status(500).json({
       success:false,
       message:err.message
     })
