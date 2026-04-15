@@ -31,11 +31,17 @@ const applyJobs = async (req, res) => {
       return res.status(400).json({
         success: false,
         message: "you have already applied to this job",
+        error:{
+          code:"ALREADY_APPLIED"
+        }
       });
     }
     return res.status(403).json({
       success: false,
-      err: err.message,
+      message:"server error",
+      error:{
+        code:"INTERNAL_SERVER_ERROR"
+      }
     });
   }
 };

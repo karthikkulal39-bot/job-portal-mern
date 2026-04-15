@@ -24,4 +24,5 @@ authRoutes.post('/auth/logout-all', isAuthenticated, logOutFromAll);
 
 authRoutes.patch('/auth/change-password', isAuthenticated, changePasswordValidator, changePassword);
 
+authRoutes.post('/auth/verify-otp',isAuthenticated)
 module.exports = authRoutes;

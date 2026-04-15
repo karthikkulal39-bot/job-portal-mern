@@ -1,7 +1,8 @@
 const mongoose=require('mongoose');
 const authSchema=new mongoose.Schema({
     userId:{
-        type:mongoose.Schema.Types.ObjectId,ref:'User'
+        type:mongoose.Schema.Types.ObjectId,
+        ref:'User'
     },
     refreshToken:{
         type:String,

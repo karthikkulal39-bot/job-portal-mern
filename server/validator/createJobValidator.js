@@ -6,8 +6,7 @@ exports.createJobValidator = [
   body("company")
   .trim()
     .notEmpty()
-    .withMessage("company Name cannot be Empty ")
-    ,
+    .withMessage("company Name cannot be Empty "),
 
   body("location")
     .notEmpty()
@@ -67,7 +66,10 @@ exports.createJobValidator = [
       (400).json({
         success:false,
         message:"validation error",
-        errors:errors.array()
+        error:{
+          code:MISSING_VALUES,
+          err:errors.array()
+        }
       });
     }
 
