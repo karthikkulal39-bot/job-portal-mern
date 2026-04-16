@@ -4,7 +4,7 @@ const decodeJWT = require("../utils/decodeJWT");
 const sendToken = require("../utils/sendToken");
 const Session = require("../models/authModel");
 
-const generateOtp = require("../utils/generateOTP");
+const {generateOtp} = require("../utils/generateOTP");
 const { sendEmail } = require("../utils/sendEmail");
 const otpModel = require("../models/otpModel");
 
@@ -19,17 +19,20 @@ exports.userSignUp = async (req, res) => {
   });
   try {
     const checkUser = await users.findOne({ email: allowedValues.email }).select("+verified");
-    if (checkUser?.verified) {
-      return res.status(404).json({
-        success: false,
-        message: "user already exists.",
-        data: null,
-        error: {
-          code: "USER_ALREADY_EXISTS",
-        },
+    
+    if(!checkUser){
+
+      const user = new users(allowedValues);
+      const { firstname, lastname, email, usertype } = await user.save();
+      return res.status(201).json({
+        success: true,
+        data: { firstname, lastname, email, usertype },
       });
     }
-    if(!checkUser?.verified){ 
+
+
+
+    if(!checkUser.verified){ 
       return res.status(403).json({
         success:false,
         message:"verify otp",
@@ -38,13 +41,16 @@ exports.userSignUp = async (req, res) => {
         }
       })
     }
-
-    const user = new users(allowedValues);
-    const { firstname, lastname, email, usertype } = await user.save();
-    return res.status(201).json({
-      success: true,
-      data: { firstname, lastname, email, usertype },
-    });
+     
+      return res.status(404).json({
+        success: false,
+        message: "user already exists.",
+        data: null,
+        error: {
+          code: "USER_ALREADY_EXISTS",
+        },
+      });
+  
   } catch (error) {
     return res.status(500).json({
       success: false,
@@ -61,7 +67,7 @@ exports.userLogin = async (req, res) => {
   const { email, password } = req.body;
 
   try {
-    const foundUser = await users.findOne({ email: email });
+    const foundUser = await users.findOne({ email: email }).select("+email +password +verified");
     // console.log(foundUser);
     if (!foundUser) {
       return res.status(401).json({
@@ -69,7 +75,7 @@ exports.userLogin = async (req, res) => {
         message: "Invalid credentials ",
       });
     }
-    if(!foundUser?.verified){
+    if(!foundUser.verified){
       return res.status(401).json({
         success:false,
         message:"not verified please verify otp",
@@ -233,7 +239,7 @@ exports.otpSend = async (req, res) => {
   try {
     const userData = await users
       .findOne({ email: email })
-      .select("+_id +verified");
+      .select("verified");
       if(!userData){
         res.status(404).json({
           success:false,
@@ -252,14 +258,15 @@ exports.otpSend = async (req, res) => {
         },
       });
     }
-
+    const otp = generateOtp();
+  
     const verify = new otpModel({
-      userid: userData._id,
+      userId: userData._id,
       email: email,
-      otp: otp,
+      otp: otp
     });
     await verify.save();
-    const otp = generateOtp();
+    
     const options = {
       email: email,
       subject: `${firstName} your job portal email verification code.`,
@@ -272,6 +279,7 @@ exports.otpSend = async (req, res) => {
       message:"Otp sent successfully"
     })
   } catch (err) {
+    console.log(err);
     if(err.code===11000){
       return res.status(400).json({
         success:false,
@@ -284,7 +292,7 @@ exports.otpSend = async (req, res) => {
     }
     return res.status(500).json({
       success:false,
-      message:"internal server error",
+      message:err.message,
       error:{
         code:"INTERNAL_SERVER_ERROR"
       }
@@ -293,8 +301,12 @@ exports.otpSend = async (req, res) => {
 };
 
 exports.otpVerify=async(req,res)=>{
-  const {email,otp}=req.body;
-  const user=await otpModel.findOne({email:email}).select("+otp +email").populate("userId","_id");
+  const {firstname,lastname,email,otp}=req.body;
+  
+ try{
+  
+  const user=await otpModel.findOne({email:email}).select("otp email").populate("userId");
+ 
   if(!user){
        return res.status(409).json({
           success:false,
@@ -313,7 +325,9 @@ exports.otpVerify=async(req,res)=>{
           }
         })
       }
+    
       const checkOtp=await comparePass(otp,user.otp);
+  
       if(!checkOtp){
         return res.status(400).json({
           success:false,
@@ -323,5 +337,26 @@ exports.otpVerify=async(req,res)=>{
           }
         })
       }
+      const finalData=user.userId;
+
+
+      finalData.firstname=firstname;
+      finalData.lastname=lastname;
+      finalData.verified=true;
+      finalData.save();
+      return res.status(200).json({
+        success:true,
+        message:"verified. you can login now"
+      })
+    }
+    catch(err){
+      return res.status(500).json({
+        success:false,
+        message:"server error",
+        error:{
+          code:"INTERNAL_SERVER_ERROR"
+        }
+      })
+    }
       
 }

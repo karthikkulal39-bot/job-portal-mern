@@ -1,10 +1,12 @@
 const express = require("express");
 const authRoutes = express.Router();
-const { userSignUp, userLogin, logOut, logOutFromAll, changePassword, refreshYourTokens } = require("../controllers/authController");
+const { userSignUp, userLogin, logOut, logOutFromAll, changePassword, refreshYourTokens, otpSend, otpVerify } = require("../controllers/authController");
 const {
   authSignupValidator,
   authLoginValidator,
   changePasswordValidator,
+  sendotpValidator,
+  verifyOtpValidator,
 } = require("../validator/authValidator");
 const { isAuthenticated } = require("../middlewares/auth");
 
@@ -24,5 +26,7 @@ authRoutes.post('/auth/logout-all', isAuthenticated, logOutFromAll);
 
 authRoutes.patch('/auth/change-password', isAuthenticated, changePasswordValidator, changePassword);
 
-authRoutes.post('/auth/verify-otp',isAuthenticated)
+authRoutes.post('/auth/send-otp',sendotpValidator,otpSend);
+authRoutes.post('/auth/verify-otp',verifyOtpValidator,otpVerify);
+
 module.exports = authRoutes;

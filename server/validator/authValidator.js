@@ -1,4 +1,4 @@
-const { validationResult, body } = require("express-validator");
+const { validationResult, body, matchedData } = require("express-validator");
 exports.authLoginValidator = [
   body("email")
     .trim()
@@ -21,6 +21,7 @@ exports.authLoginValidator = [
     next();
   },
 ];
+
 
 exports.authSignupValidator = [
   body("firstname").trim().notEmpty().withMessage("first cannot empty"),
@@ -96,3 +97,56 @@ exports.changePasswordValidator=[
         next();
 
 }];
+
+
+exports.verifyOtpValidator = [
+  body("firstname").trim().notEmpty().withMessage("first cannot empty"),
+  body("lastname").trim(),
+  body("email")
+    .isEmail()
+    .notEmpty()
+    .withMessage("email cannot be empty or invalid email")
+    .normalizeEmail(),
+  body("otp").isLength({ min: 6, max: 6 })
+  .withMessage("OTP must be 6 digits")
+  .isNumeric()
+  .withMessage("OTP must contain only numbers"),
+  
+    body("role").optional().isIn(["user","recruiter"]).withMessage("invalid role selected "),
+
+    (req,res,next)=>{
+        const err=validationResult(req);
+        if(!err.isEmpty()){
+            return res.status(400).json({
+                success:false,
+                errors:err.array()
+            })
+        }
+        req.body=matchedData(req,{onlyValidData:true})
+        next();
+
+    }
+
+    
+];
+exports.sendotpValidator=[
+  body("email")
+    .trim()
+    .notEmpty()
+    .withMessage("email cannot be empty or invalid email")
+    .normalizeEmail(),
+    body("firstname").trim().notEmpty().withMessage("first cannot empty"),
+   (req,res,next)=>{
+        const err=validationResult(req);
+        if(!err.isEmpty()){
+            return res.status(400).json({
+                success:false,
+                errors:err.array()
+            })
+        }
+        req.body=matchedData(req,{onlyValidData:true})
+        next();
+
+    }
+
+]

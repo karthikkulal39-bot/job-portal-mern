@@ -4,7 +4,7 @@ const bcrypt=require('bcryptjs');
 const otpModule=new mongoose.Schema({
     userId:{
         type:mongoose.Schema.Types.ObjectId,
-        ref:users,
+        ref:"Users",
         required:true,
     },
     email:{
@@ -13,20 +13,29 @@ const otpModule=new mongoose.Schema({
         unique:true
     },
     otp:{
-        type:Number,
+        type:String,
         required:true,
-        createdAt:{
-            type:date,
-            default:now.Date(),
-            expires:300
+       
+    },
+    createdAt:{
+            type:Date,
+            default:Date.now,
+            expires:3600
         }
-    }
 });
-otpModule.pre("save",async()=>{
+otpModule.pre("save",async function(){
+    
     try{
-        this.otp=await bcrypt.hash(this.otp,10);
+        if(!this.otp){
+            throw new Error("OTP is required");
+
+        }
+        if(!this.isModified("otp")){
+            return ;
+        }
+        this.otp=await bcrypt.hash(String(this.otp),10);
     }catch(err){
-        throw new Error(err);
+       throw new Error(err.message);
     }
 })
 module.exports=mongoose.model("otpModels",otpModule);
