@@ -7,7 +7,12 @@ const router = createBrowserRouter([
     {
         element:<MainLayout/>,
         children:[
-            {path:'/',element:<LandingPage/>},
+            {
+                path:'/',element:<LandingPage/>
+            },
+            {
+                path:"/signup",element:<SignUp/>
+            }
         ]
     },
     {

@@ -97,7 +97,7 @@ exports.getAllJobs = async (req, res) => {
       totalPages:totalPage,
       currentPage:pages,
       data: allJobs,
-    });
+    });    
   } catch (err) {
     return res.status(500).json({
       success: false,

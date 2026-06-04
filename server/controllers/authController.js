@@ -18,10 +18,8 @@ exports.userSignUp = async (req, res) => {
     }
   });
   try {
-    const checkUser = await users.findOne({ email: allowedValues.email }).select("+verified");
-    
+    const checkUser = await users.findOne({ email: allowedValues.email }).select("+verified");   
     if(!checkUser){
-
       const user = new users(allowedValues);
       const { firstname, lastname, email, usertype } = await user.save();
       return res.status(201).json({
@@ -29,8 +27,6 @@ exports.userSignUp = async (req, res) => {
         data: { firstname, lastname, email, usertype },
       });
     }
-
-
 
     if(!checkUser.verified){ 
       return res.status(403).json({
@@ -276,7 +272,8 @@ exports.otpSend = async (req, res) => {
     await sendEmail(options);
     res.status(200).json({
       success:true,
-      message:"Otp sent successfully"
+      message:"Otp sent successfully",
+      expires:3600
     })
   } catch (err) {
     console.log(err);
