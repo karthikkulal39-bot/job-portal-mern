@@ -1,7 +1,9 @@
+import NetworkErrPage from "@/components/errors/NetworkErrPage";
+import PageNotFound from "@/components/errors/PageNotFound";
 import { useMutation } from "@tanstack/react-query";
 import axios from "axios";
 import React, { useState } from "react";
-import { useForm } from "react-hook-form";
+import  { useForm } from "react-hook-form";
 const SignUp = () => {
   const {
     register,
@@ -14,20 +16,39 @@ const SignUp = () => {
 
   const registerMutate=useMutation({
     mutationFn:(userData)=>{
-      axios.post('/usersignup',userData);
-    }
+      return axios.post('http://localhost:5000/usersignup2',userData);
+    },
+    onError: (error) => {
+  console.log("iam ",error.message);
+  console.log("me",error?.response?.data);
+}
   })
   const pass = watch("password");
 
   const onsubmit = (data) => {
-     registerMutate(data);
-     
+     registerMutate.mutate(data);   
 
   };
+
+  if(registerMutate.isPending){
+    return <div> loaading</div>
+  }
+  // {console.log(registerMutate.error?.response)}
+  // {console.log(registerMutate?.data)}
+  //  {console.log(registerMutate?.isSuccess)}
+  switch(registerMutate.error?.response?.status || registerMutate.error?.code ){
+    case 404:
+     return <PageNotFound message={registerMutate.error?.response}/>; 
+    case 'ERR_NETWORK':
+      return <NetworkErrPage/>;    
+  }
   
 
   return (
     <div>
+     <div> {registerMutate.error?.response?.data?.errors?.map((err,key)=>(
+         <p key={key}>{err.msg}</p>
+      ))} </div>
       <form onSubmit={handleSubmit(onsubmit)}>
         <div>
           <div>
