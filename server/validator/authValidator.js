@@ -59,6 +59,7 @@ exports.authSignupValidator = [
                 errors:err.array()
             })
         }
+        console.log("backend calllled");
         next();
 
     }

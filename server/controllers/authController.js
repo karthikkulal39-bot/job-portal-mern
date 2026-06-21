@@ -21,10 +21,10 @@ exports.userSignUp = async (req, res) => {
     const checkUser = await users.findOne({ email: allowedValues.email }).select("+verified");   
     if(!checkUser){
       const user = new users(allowedValues);
-      const { firstname, lastname, email, usertype } = await user.save();
+      const { firstname, lastname, email, role } = await user.save();
       return res.status(201).json({
         success: true,
-        data: { firstname, lastname, email, usertype },
+        data: { firstname, lastname, email, role },
       });
     }
 
@@ -255,7 +255,7 @@ exports.otpSend = async (req, res) => {
       });
     }
     const otp = generateOtp();
-  
+  console.log("otp cheat code :) :",otp);
     const verify = new otpModel({
       userId: userData._id,
       email: email,

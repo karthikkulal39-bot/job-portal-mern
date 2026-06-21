@@ -1,80 +1,58 @@
-import React, { useState } from "react";
+import React from "react";
 import { NavLink } from "react-router-dom";
-import { Briefcase, Menu, X } from "lucide-react";
-
+import { BriefcaseBusiness,LogIn } from "lucide-react";
+import { motion } from "framer-motion";
 const PublicNavBar = () => {
-  const [isOpen, setIsOpen] = useState(false);
-
+  const MotionLogo = motion(BriefcaseBusiness);
+  const MotionLogin=motion(LogIn);
   return (
-    <nav className="sticky top-0 z-50 bg-white shadow-md border-b border-gray-100">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
-          {/* Logo */}
-          <div className="flex items-center gap-2 font-bold text-xl bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent hover:opacity-80 transition-opacity">
-            <Briefcase className="w-7 h-7 text-blue-600" />
-            <span>JobPortal</span>
-          </div>
+    <nav className="top-0 bg-black/90 backdrop-blur-md sticky z-50">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-6 p-4 m-4  ">
+          <MotionLogo
+            className=" outline-none w-10 h-10 text-purple-600  rounded"
+            whileHover={{ scale: 1.2 }}
+            whileTap={{ x: 380, rotate: 360, scale: 1.2 }}
+            transition={{ duration: 0.5 }}
+          />
 
-          {/* Mobile menu button */}
-          <button
-            onClick={() => setIsOpen(!isOpen)}
-            className="md:hidden p-2 rounded-lg hover:bg-gray-100 transition-colors text-gray-700"
+          <motion.h1
+            animate={{
+              backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"],
+            }}
+            transition={{
+              duration: 4,
+              repeat: Infinity,
+            }}
+            className="
+                text-5xl
+                font-extrabold
+                bg-gradient-to-r
+                from-cyan-500
+                via-violet-500
+                to-pink-500
+                bg-[length:200%_200%]
+                bg-clip-text
+                text-transparent
+               "
           >
-            {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+            JOBPORTAL
+          </motion.h1>
+        </div>
+
+        <div className="flex  gap-4 items-center  group">
+          <button 
+            className=" flex items-center ml-4  gap-2 group-hover:scale-105  transition-all duration-300 bg-gradient-to-r from-cyan-500 to-violet-500 text-white px-4 py-2 rounded-lg">
+
+            <MotionLogin className="text-white"/>
+            <span className="text-white text-sm font-mono group-hover:scale-90 transition-all duration-500">Login</span>
           </button>
+          <button 
+            className=" flex items-center ml-4  gap-2 group-hover:scale-105  transition-all duration-300 bg-gradient-to-r from-cyan-500 to-violet-500 text-white px-4 py-2 rounded-lg">
 
-          {/* Desktop Navigation */}
-          <div className={`${isOpen ? 'block' : 'hidden'} md:flex gap-2 absolute md:static top-16 left-0 right-0 md:top-auto bg-white md:bg-transparent p-4 md:p-0 flex-col md:flex-row w-full md:w-auto border-t md:border-t-0 border-gray-100`}>
-            <NavLink
-              to="/"
-              className={({ isActive }) =>
-                `px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
-                  isActive
-                    ? "bg-blue-100 text-blue-600"
-                    : "text-gray-700 hover:bg-gray-100"
-                }`
-              }
-            >
-              About
-            </NavLink>
-
-            <NavLink
-              to="/"
-              className={({ isActive }) =>
-                `px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
-                  isActive
-                    ? "bg-blue-100 text-blue-600"
-                    : "text-gray-700 hover:bg-gray-100"
-                }`
-              }
-            >
-              Login
-            </NavLink>
-
-            <NavLink
-              to="/signup"
-              className={({ isActive }) =>
-                `px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
-                  isActive
-                    ? "bg-blue-100 text-blue-600"
-                    : "text-gray-700 hover:bg-gray-100"
-                }`
-              }
-            >
-              SignUp
-            </NavLink>
-
-            <NavLink
-              to="/"
-              className={({ isActive }) =>
-                `px-4 py-2 rounded-lg font-medium bg-gradient-to-r from-blue-600 to-indigo-600 text-white hover:shadow-lg transition-all duration-200 transform hover:scale-105 ${
-                  isActive ? "shadow-lg" : ""
-                }`
-              }
-            >
-              Get Started
-            </NavLink>
-          </div>
+        
+            <span className="text-white text-sm font-mono group-hover:scale-90 transition-all duration-500">signIn</span>
+          </button>
         </div>
       </div>
     </nav>
