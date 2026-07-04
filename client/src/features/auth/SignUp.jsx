@@ -60,7 +60,7 @@ const SignUp = () => {
   }
 
   return (
-    <div>
+    <div className="bg-red-500 border-red-800 w-[100vw] h-[100vh] overflow-auto">
       <div>
         {" "}
         {registerMutate.error?.response?.data?.errors?.map((err, key) => (

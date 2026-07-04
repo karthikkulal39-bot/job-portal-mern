@@ -1,10 +1,11 @@
 import {createBrowserRouter} from 'react-router-dom'
 import MainLayout from '../layouts/MainLayout'
 import LandingPage from '../components/LandingPage'
-import SignUp from '@/features/auth/SignUp'
 import path from 'node:path';
 import PageNotFound from '@/components/errors/PageNotFound';
-
+import LoadingScreen from '@/components/errors/LoadingScreen';
+import {Suspense,lazy} from 'react'
+const Signup = lazy(() =>import('../features/auth/Signup'));
 const router = createBrowserRouter([
     {
         
@@ -15,7 +16,11 @@ const router = createBrowserRouter([
                 path:'/',element:<LandingPage/>
             },
             {
-                path:"/signup",element:<SignUp/>
+                path:"/signup",element:(
+                <Suspense fallback={<LoadingScreen/>}>
+                  <Signup/>
+                </Suspense>
+              )
             },
             {
                 path:"*",element:<PageNotFound/>
