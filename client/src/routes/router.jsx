@@ -5,7 +5,7 @@ import path from 'node:path';
 import PageNotFound from '@/components/errors/PageNotFound';
 import LoadingScreen from '@/components/errors/LoadingScreen';
 import {Suspense,lazy} from 'react'
-const Signup = lazy(() =>import('../features/auth/Signup'));
+const Signup = lazy(() =>import('../features/auth/SignUp'));
 const router = createBrowserRouter([
     {
         

@@ -4,16 +4,18 @@ import {Skeleton} from "../ui/skeleton"
 const LoadingScreen = () => {
 
   return (
-    <div className="flex h-full w-full max-w-xs flex-col gap-7">
-      <div className="flex flex-col gap-3">
-        <Skeleton className="h-4 w-20" />
-        <Skeleton className="h-8 w-full" />
+   <div className="flex items-center justify-center w-full h-screen bg-slate-500">
+      <div className="flex flex-col gap-6 w-full max-w-2xl  p-8">
+        <div className="flex flex-col gap-4">
+          <Skeleton className="h-6 w-32" />
+          <Skeleton className="h-12 w-full" />
+        </div>
+        <div className="flex flex-col gap-4">
+          <Skeleton className="h-6 w-40" />
+          <Skeleton className="h-12 w-full" />
+        </div>
+        <Skeleton className="h-12 w-32" />
       </div>
-      <div className="flex flex-col gap-3">
-        <Skeleton className="h-4 w-24" />
-        <Skeleton className="h-8 w-full" />
-      </div>
-      <Skeleton className="h-8 w-24" />
     </div>
   )
 }

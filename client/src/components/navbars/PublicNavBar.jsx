@@ -5,12 +5,26 @@ import { Button } from "../ui/button";
 import { useNavigate } from "react-router-dom";
 import { Sheet,SheetContent, SheetTrigger } from "../ui/sheet";
 import { DropdownMenuContent, DropdownMenuTrigger,DropdownMenu } from "../ui/dropdown-menu";
+import { useLocation } from "react-router-dom";
+
 const PublicNavBar = () => {
+
+  const location = useLocation();
+  const [signUpDisabled,setSignUpDisabled]=useState(false);
+  const [loginDisabled,setLoginDisabled]=useState(false);
+
   const MotionLogo = motion.create(BriefcaseBusiness);
   const MotionLogin = motion.create(LogIn);
   const [open,setOpen]=useState(false);
   const navigate=useNavigate();
+  useEffect(()=>{
+  if(location.pathname==="/signup"){
+      setSignUpDisabled(true);
+    }else setSignUpDisabled(false);
 
+  },[location.pathname]);
+  
+ 
   useEffect(()=>{
     const media=window.matchMedia("(min-width:768px)");
     const handleMediaChange=(e)=>{
@@ -36,7 +50,7 @@ const PublicNavBar = () => {
             transition={{ duration: 0.5 }}
           />
 
-          <motion.h1
+          <motion.h1 onClick={()=>navigate('/')}
             animate={{
               backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"],
             }}
@@ -69,7 +83,11 @@ const PublicNavBar = () => {
             </span>
           </Button>
 
-          <Button onClick={()=>{navigate("/signup")}} className=" flex items-center ml-4  gap-2 group group-hover:scale-105  transition-all duration-300 bg-gradient-to-r from-cyan-500 to-violet-500 text-white px-4 py-2 rounded-lg">
+          <Button onClick={()=>{
+            navigate("/signup");
+            setSignUpDisabled(true);
+          }} className={` flex items-center ml-4  gap-2 group group-hover:scale-105  transition-all duration-300 bg-gradient-to-r from-cyan-500 to-violet-500 text-white px-4 py-2 rounded-lg ${signUpDisabled ? "opacity-50 cursor-not-allowed" : "bg-gradient-to-r from-cyan-500 to-violet-500"}`}
+           disabled={signUpDisabled}>
             {" "}
             <span className="text-white text-sm font-mono group-hover:scale-90 transition-all duration-500">
               Sign Up

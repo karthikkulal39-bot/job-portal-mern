@@ -5,7 +5,9 @@ import LoadingScreen from './components/errors/LoadingScreen'
 function App() {
  
   return (  
-    <Suspense fallback={<LoadingScreen/>}>
+    <Suspense fallback={
+ <LoadingScreen
+    />}>
       <RouterProvider router={router}/>
   </Suspense>
   )
