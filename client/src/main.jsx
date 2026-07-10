@@ -10,7 +10,7 @@ const queryClient = new QueryClient();
 createRoot(document.getElementById("root")).render(
   <QueryClientProvider client={queryClient}>
     <StrictMode>
-      <Toaster closeButton position="top"/>
+      <Toaster closeButton/>
       <App />
        <ReactQueryDevtools initialIsOpen={false} />
     </StrictMode>

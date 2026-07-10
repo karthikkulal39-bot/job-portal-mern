@@ -16,15 +16,21 @@ const InputField = ({
   register,
   Password,
   isPassword,
+  pattern,
   ...props
 }) => {
   const registerOptions = {
     required: `${Label} is required`,
-    ...(Password && {
-      validate: (value) => {
-        return value === Password || "Password not matching";
-      },
-    }),
+   ...(type==="password"&& {pattern:{
+     value:/^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>/?]).{8,}$/,
+     message:"Password must be at least 8 characters long, contain one uppercase letter, one number and one special character.",
+    }
+   }),
+   ...(Password &&{
+    validate:(value)=>{
+      return value===Password || "password is not matching"
+    }
+   })
   };
   const [passVis, setPassVis] = useState(true);
   return (
@@ -38,6 +44,7 @@ const InputField = ({
           minLength={minLength}
           maxLength={maxLength}
           placeholder={placeholder}
+          
           {...register(name, registerOptions)}
           {...props}
         />

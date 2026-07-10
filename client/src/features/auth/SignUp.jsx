@@ -1,11 +1,10 @@
 import PageNotFound from "@/components/errors/PageNotFound";
-import { Eye, EyeOff } from "lucide-react";
 import { useMutation } from "@tanstack/react-query";
 import axios from "axios";
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { NavLink, useNavigate } from "react-router-dom";
-import { errorToast } from "@/utils/toasts";
+import { errorToast, successToast } from "@/utils/toasts";
 import { Input } from "../../components/ui/input";
 
 import {
@@ -25,6 +24,8 @@ import {
 } from "../../components/ui/field";
 import InputField from "@/components/InputField";
 import LoadingScreen from "@/components/errors/LoadingScreen";
+import { Icon, Variable } from "lucide-react";
+
 const SignUp = () => {
   const {
     register,
@@ -33,15 +34,13 @@ const SignUp = () => {
     watch,
   } = useForm({ mode: "onChange" });
 
-  const [passVis, setPassVis] = useState(true);
-  const [confPassVis, setConfPassVis] = useState(true);
   const navigate = useNavigate();
   const registerMutate = useMutation({
     mutationFn: (userData) => {
       return axios.post("http://localhost:5000/usersignup", userData);
     },
-    onError: (error) => {
-      switch (error?.response?.status || error?.code) {
+    onError: (error, variables) => {
+      switch (error?.response?.status || error?.response?.data?.error?.code) {
         case 404:
           navigate("/pageNotFound");
           break;
@@ -54,14 +53,50 @@ const SignUp = () => {
           errorToast("internal server error try some time later ...", {
             duration: 1000,
           });
+        case 403:
+          errorToast("redirecting to otp verification... please wait", {
+            duration: 5000,
+          });
 
-        case "USER_ALREADY_EXISTS":
+          sessionStorage.setItem(
+            "signupdata",
+            JSON.stringify({
+              email: variables.email,
+              name: variables.name,
+            }),
+          );
+
+          setTimeout(() => {
+            navigate("/otp-verify");
+          }, 2000);
+          break;
+
+        case 409:
+          successToast(
+            "You already have an account. Redirecting to the login page...",
+            { duration: 5000 },
+          );
+          setTimeout(() => {
+            navigate("/login");
+          }, 2000);
           break;
       }
     },
-    onSuccess: (response) => {
-      console.log(response?.data);
-      navigate("/login");
+    onSuccess: (response, variables) => {
+      console.log(response);
+      sessionStorage.setItem(
+        "signupdata",
+        JSON.stringify({
+          email: variables.email,
+          name: variables.name,
+        }),
+      );
+      successToast("redirecting to otp verification... please wait", {
+        duration: 5000,
+      });
+      setTimeout(() => {
+        navigate("/otp-verify");
+      }, 5000);
     },
   });
 
@@ -75,24 +110,27 @@ const SignUp = () => {
 
   return (
     <div className="bg-black w-full h-full; flex flex-col justify-center items-center [&>*]:text-white ">
-      <div className="border-2 w-[35%] max-w-lg rounded-md p-2 bg-red-100 text-red-500  mb-4 mt-4 flex flex-col gap-0
-      ">
+      <div
+        className=" w-[32%]
+      "
+      >
         {" "}
-        {registerMutate.error?.response?.data?.errors?.map((err, key) => (
-          <ul className="text-red-500 text-sm list-disc gap-0 "  key={key} >
-            <li className="" key={key}>{err.msg}</li>
-          </ul>
-        ))}{" "}
+        <ul className=" text-sm list-disc  w-full max-w-lg rounded-md p-1 bg-transparent text-red-500  mb-2 mt-4 flex flex-col gap-1">
+          {registerMutate.error?.response?.data?.errors?.map((err, key) => (
+            <li className="" key={key}>
+              {err.msg}
+            </li>
+          ))}{" "}
+        </ul>
       </div>
-      
-      
+
       <Card className="w-[80%] max-w-lg flex flex-col  rounded-lg h-full   p-6  shadow-2xl shadow-red-600 border-0 mb-10">
         <form onSubmit={handleSubmit(onsubmit)} className="">
           <CardHeader className="mb-4">
             <CardTitle>Create your new Account</CardTitle>
           </CardHeader>
           <div className="flex flex-col gap-3">
-           {/* firstName input */}
+            {/* firstName input */}
             <InputField
               id="firstName"
               type="text"
@@ -145,14 +183,12 @@ const SignUp = () => {
               watch={watch}
               errors={errors}
               isPassword={true}
-              pattern="^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};':&quot;\\|,.<>\/?]).{8,}$"
-              title="Password must contain an uppercase letter, a number, and be at least 8 characters."
             />
 
             {/* confirm password input */}
             <InputField
               id="confPassword"
-              type={confPassVis ? "password" : "text"}
+              type="password"
               name="confirmPassword"
               minLength={2}
               maxLength={15}
