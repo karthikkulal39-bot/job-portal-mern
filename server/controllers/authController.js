@@ -38,7 +38,7 @@ exports.userSignUp = async (req, res) => {
       })
     }
      
-      return res.status(404).json({
+      return res.status(409).json({
         success: false,
         message: "user already exists.",
         data: null,
