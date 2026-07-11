@@ -25,6 +25,7 @@ import {
 import InputField from "@/components/InputField";
 import LoadingScreen from "@/components/errors/LoadingScreen";
 import { Icon, Variable } from "lucide-react";
+import { Spinner } from "@/components/ui/spinner";
 
 const SignUp = () => {
   const {
@@ -36,6 +37,7 @@ const SignUp = () => {
 
   const navigate = useNavigate();
   const registerMutate = useMutation({
+    mutationKey:["signup"],
     mutationFn: (userData) => {
       return axios.post("http://localhost:5000/usersignup", userData);
     },
@@ -55,7 +57,7 @@ const SignUp = () => {
           });
         case 403:
           errorToast("redirecting to otp verification... please wait", {
-            duration: 5000,
+            duration:2000,
           });
 
           sessionStorage.setItem(
@@ -67,18 +69,18 @@ const SignUp = () => {
           );
 
           setTimeout(() => {
-            navigate("/otp-verify");
-          }, 2000);
+            navigate("/signup/otp-verify");
+          }, 1000);
           break;
 
         case 409:
           successToast(
             "You already have an account. Redirecting to the login page...",
-            { duration: 5000 },
+            { duration: 2000 },
           );
           setTimeout(() => {
             navigate("/login");
-          }, 2000);
+          }, 1000);
           break;
       }
     },
@@ -92,11 +94,11 @@ const SignUp = () => {
         }),
       );
       successToast("redirecting to otp verification... please wait", {
-        duration: 5000,
+        duration: 2000,
       });
       setTimeout(() => {
-        navigate("/otp-verify");
-      }, 5000);
+        navigate("/signup/otp-verify");
+      }, 1000);
     },
   });
 
