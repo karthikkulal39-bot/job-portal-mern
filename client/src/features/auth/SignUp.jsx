@@ -1,9 +1,9 @@
 import PageNotFound from "@/components/errors/PageNotFound";
 import { useMutation } from "@tanstack/react-query";
 import axios from "axios";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import { NavLink, useNavigate } from "react-router-dom";
+import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import { errorToast, successToast } from "@/utils/toasts";
 import { Input } from "../../components/ui/input";
 
@@ -36,6 +36,12 @@ const SignUp = () => {
   } = useForm({ mode: "onChange" });
 
   const navigate = useNavigate();
+  const location=useLocation();
+  useEffect(()=>{
+    if(!location.state?.message)return;
+    errorToast(location.state?.message,2000);
+  },[location.state])
+  
   const registerMutate = useMutation({
     mutationKey:["signup"],
     mutationFn: (userData) => {
