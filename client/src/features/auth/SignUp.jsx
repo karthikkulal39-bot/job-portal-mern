@@ -70,7 +70,7 @@ const SignUp = () => {
             "signupdata",
             JSON.stringify({
               email: variables.email,
-              name: variables.name,
+              firstName: variables.firstname,
             }),
           );
 
@@ -96,7 +96,7 @@ const SignUp = () => {
         "signupdata",
         JSON.stringify({
           email: variables.email,
-          name: variables.name,
+          firstName: variables.firstname,
         }),
       );
       successToast("redirecting to otp verification... please wait", {
