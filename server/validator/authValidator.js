@@ -24,7 +24,7 @@ exports.authLoginValidator = [
 
 
 exports.authSignupValidator = [
-  body("firstname").trim().notEmpty().withMessage("first cannot empty"),
+  body("firstname").trim().notEmpty().withMessage("first is cannot empty"),
   body("lastname").trim(),
   body("email")
     .isEmail()
@@ -101,7 +101,7 @@ exports.changePasswordValidator=[
 
 
 exports.verifyOtpValidator = [
-  body("firstname").trim().notEmpty().withMessage("first cannot empty"),
+  body("firstName").trim().notEmpty().withMessage("first is cannot empty"),
   body("lastname").trim(),
   body("email")
     .isEmail()
@@ -131,12 +131,12 @@ exports.verifyOtpValidator = [
     
 ];
 exports.sendotpValidator=[
+  body("firstName").trim().notEmpty().withMessage("first cannot empty"),
   body("email")
     .trim()
     .notEmpty()
     .withMessage("email cannot be empty or invalid email")
     .normalizeEmail(),
-    body("firstname").trim().notEmpty().withMessage("first cannot empty"),
    (req,res,next)=>{
         const err=validationResult(req);
         if(!err.isEmpty()){

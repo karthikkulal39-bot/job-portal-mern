@@ -9,7 +9,7 @@ const otpModule=new mongoose.Schema({
     },
     email:{
         type:String,
-        reuqired:true,
+        required:true,
         unique:true
     },
     otp:{

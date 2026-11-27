@@ -237,7 +237,7 @@ exports.otpSend = async (req, res) => {
       .findOne({ email: email })
       .select("verified");
       if(!userData){
-        res.status(404).json({
+        return res.status(404).json({
           success:false,
           message:"user not found",
           error:{
@@ -255,13 +255,22 @@ exports.otpSend = async (req, res) => {
       });
     }
     const otp = generateOtp();
-  console.log("otp cheat code :) :",otp);
-    const verify = new otpModel({
-      userId: userData._id,
-      email: email,
-      otp: otp
-    });
-    await verify.save();
+    console.log(otp);
+    let verify = await otpModel.findOne({ email });
+
+    if (verify) {
+      verify.userId = userData._id;
+      verify.otp = String(otp);
+      verify.createdAt = new Date();
+      await verify.save();
+    } else {
+      verify = new otpModel({
+        userId: userData._id,
+        email: email,
+        otp: otp,
+      });
+      await verify.save();
+    }
     
     const options = {
       email: email,
@@ -276,7 +285,6 @@ exports.otpSend = async (req, res) => {
       expires:3600
     })
   } catch (err) {
-    console.log(err);
     if(err.code===11000){
       return res.status(400).json({
         success:false,
@@ -298,7 +306,7 @@ exports.otpSend = async (req, res) => {
 };
 
 exports.otpVerify=async(req,res)=>{
-  const {firstname,lastname,email,otp}=req.body;
+  const {firstName,lastname,email,otp}=req.body;
   
  try{
   
@@ -337,10 +345,10 @@ exports.otpVerify=async(req,res)=>{
       const finalData=user.userId;
 
 
-      finalData.firstname=firstname;
+      finalData.firstname=firstName;
       finalData.lastname=lastname;
       finalData.verified=true;
-      finalData.save();
+      await finalData.save();
       return res.status(200).json({
         success:true,
         message:"verified. you can login now"
